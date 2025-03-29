@@ -4,10 +4,12 @@ title = 'My New Hugo Site'
 
 theme = "hugo-book"
 
+googleAnalytics = "G-9WVGW5YY5G"
 
 # Book configuration
 disablePathToLower = true
 enableGitInfo = true
+
 
 # Needed for mermaid/katex shortcodes
 [markup]
@@ -21,3 +23,14 @@ startLevel = 1
 [caches]
 [caches.images]
 dir = ':cacheDir/images'
+
+
+[languages]
+[languages.en]
+contentDir = 'content/english'
+languageName = 'English'
+weight = 10
+[languages.ko]
+contentDir = 'content/korean'
+languageName = '한국어'
+weight = 20

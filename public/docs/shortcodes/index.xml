@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>My New Hugo Site</title><link>http://localhost:1313/docs/shortcodes/</link><description>Recent content on My New Hugo Site</description><generator>Hugo</generator><language>en-us</language><atom:link href="http://localhost:1313/docs/shortcodes/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>http://localhost:1313/docs/shortcodes/buttons/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://localhost:1313/docs/shortcodes/buttons/</guid><description>&lt;h1 id="buttons">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>My New Hugo Site</title><link>http://localhost:1313/docs/shortcodes/</link><description>Recent content on My New Hugo Site</description><generator>Hugo</generator><language>en</language><atom:link href="http://localhost:1313/docs/shortcodes/index.xml" rel="self" type="application/rss+xml"/><item><title/><link>http://localhost:1313/docs/shortcodes/buttons/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://localhost:1313/docs/shortcodes/buttons/</guid><description>&lt;h1 id="buttons">
  Buttons
  &lt;a class="anchor" href="#buttons">#&lt;/a>
 &lt;/h1>
@@ -200,6 +200,84 @@ f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
 &lt;span>
  \[
 f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+\]
+&lt;/span>
+
+Text continues here.&lt;/p></description></item><item><title>Test</title><link>http://localhost:1313/docs/shortcodes/test.kr/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://localhost:1313/docs/shortcodes/test.kr/</guid><description>&lt;h1 id="katex">
+ KaTeX
+ &lt;a class="anchor" href="#katex">#&lt;/a>
+&lt;/h1>
+&lt;p>한국어 테스트&lt;/p>
+&lt;h2 id="example">
+ Example
+ &lt;a class="anchor" href="#example">#&lt;/a>
+&lt;/h2>
+&lt;div class="book-columns flex flex-wrap">
+&lt;div class="flex-even markdown-inner" style="flex-grow: 1;">
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-latex" data-lang="latex">&lt;span style="display:flex;">&lt;span>{{&amp;lt; katex display=true &amp;gt;}}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f(x) = &lt;span style="color:#66d9ef">\int&lt;/span>_{-&lt;span style="color:#66d9ef">\infty&lt;/span>}^&lt;span style="color:#66d9ef">\infty\hat&lt;/span> f(&lt;span style="color:#66d9ef">\xi&lt;/span>)&lt;span style="color:#66d9ef">\,&lt;/span>e^{2 &lt;span style="color:#66d9ef">\pi&lt;/span> i &lt;span style="color:#66d9ef">\xi&lt;/span> x}&lt;span style="color:#66d9ef">\,&lt;/span>d&lt;span style="color:#66d9ef">\xi&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{{&amp;lt; /katex &amp;gt;}}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div> &lt;/div>
+&lt;div class="flex-even markdown-inner" style="flex-grow: 1;">
+&lt;link rel="stylesheet" href="http://localhost:1313/katex/katex.min.css" />
+&lt;script defer src="http://localhost:1313/katex/katex.min.js">&lt;/script>
+&lt;script defer src="http://localhost:1313/katex/auto-render.min.js" onload="renderMathInElement(document.body);">&lt;/script>&lt;span>
+ \[
+f(x) = \int\_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+\]
+&lt;/span>
+ &lt;/div>
+&lt;/div>
+&lt;h2 id="display-mode-example">
+ Display Mode Example
+ &lt;a class="anchor" href="#display-mode-example">#&lt;/a>
+&lt;/h2>
+&lt;p>Here is some inline example: &lt;span>
+ \(\pi(x)\)
+&lt;/span>
+, rendered in the same line. And below is &lt;code>display&lt;/code> example, having &lt;code>display: block&lt;/code>
+&lt;span>
+ \[
+f(x) = \int\_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+\]
+&lt;/span>
+
+Text continues here.&lt;/p></description></item><item><title>Test</title><link>http://localhost:1313/docs/shortcodes/test/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>http://localhost:1313/docs/shortcodes/test/</guid><description>&lt;h1 id="katex">
+ KaTeX
+ &lt;a class="anchor" href="#katex">#&lt;/a>
+&lt;/h1>
+&lt;p>KaTeX shortcode let you render math typesetting in markdown document. See &lt;a href="https://katex.org/">KaTeX&lt;/a>&lt;/p>
+&lt;h2 id="example">
+ Example
+ &lt;a class="anchor" href="#example">#&lt;/a>
+&lt;/h2>
+&lt;div class="book-columns flex flex-wrap">
+&lt;div class="flex-even markdown-inner" style="flex-grow: 1;">
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-latex" data-lang="latex">&lt;span style="display:flex;">&lt;span>{{&amp;lt; katex display=true &amp;gt;}}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>f(x) = &lt;span style="color:#66d9ef">\int&lt;/span>_{-&lt;span style="color:#66d9ef">\infty&lt;/span>}^&lt;span style="color:#66d9ef">\infty\hat&lt;/span> f(&lt;span style="color:#66d9ef">\xi&lt;/span>)&lt;span style="color:#66d9ef">\,&lt;/span>e^{2 &lt;span style="color:#66d9ef">\pi&lt;/span> i &lt;span style="color:#66d9ef">\xi&lt;/span> x}&lt;span style="color:#66d9ef">\,&lt;/span>d&lt;span style="color:#66d9ef">\xi&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{{&amp;lt; /katex &amp;gt;}}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div> &lt;/div>
+&lt;div class="flex-even markdown-inner" style="flex-grow: 1;">
+&lt;link rel="stylesheet" href="http://localhost:1313/katex/katex.min.css" />
+&lt;script defer src="http://localhost:1313/katex/katex.min.js">&lt;/script>
+&lt;script defer src="http://localhost:1313/katex/auto-render.min.js" onload="renderMathInElement(document.body);">&lt;/script>&lt;span>
+ \[
+f(x) = \int\_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
+\]
+&lt;/span>
+ &lt;/div>
+&lt;/div>
+&lt;h2 id="display-mode-example">
+ Display Mode Example
+ &lt;a class="anchor" href="#display-mode-example">#&lt;/a>
+&lt;/h2>
+&lt;p>Here is some inline example: &lt;span>
+ \(\pi(x)\)
+&lt;/span>
+, rendered in the same line. And below is &lt;code>display&lt;/code> example, having &lt;code>display: block&lt;/code>
+&lt;span>
+ \[
+f(x) = \int\_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi
 \]
 &lt;/span>
 
