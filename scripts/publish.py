@@ -10,8 +10,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from frontmatter import dump_front_matter, split_front_matter  # noqa: E402
+from frontmatter import (  # noqa: E402
+    FrontMatterError,
+    dump_front_matter,
+    split_front_matter,
+)
 
+# SLUG_RE and the language table are deliberately duplicated in new_item.py:
+# that script must run without PyYAML, so it cannot import from frontmatter.py
+# or from here. Do not "fix" the duplication by extracting a shared module.
 SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LANG_DIRS = {"ko": "korean", "en": "english"}
 REQUIRED = ("slug", "languages", "date", "title")
@@ -30,7 +37,7 @@ def load_item(item_dir):
     if not publish_md.is_file():
         raise PublishError(f"missing publish.md: {publish_md}")
 
-    meta, _ = split_front_matter(publish_md.read_text(encoding="utf-8"))
+    meta, _ = split_front_matter(publish_md.read_text(encoding="utf-8"), publish_md)
     missing = [field for field in REQUIRED if field not in meta]
     if missing:
         raise PublishError(
@@ -51,6 +58,12 @@ def load_item(item_dir):
             f"known: {', '.join(LANG_DIRS)}"
         )
     titles = meta["title"] or {}
+    if not isinstance(titles, dict):
+        raise PublishError(
+            "publish.md title must map each declared language to a title "
+            '(title:, then an indented `ko: "..."` line per language), '
+            f"not a bare {type(titles).__name__}"
+        )
     for lang in langs:
         if not titles.get(lang):
             raise PublishError(
@@ -85,19 +98,26 @@ def resolve_language(item_dir, item_id, meta, lang, content_root, force):
 
     target = content_root / LANG_DIRS[lang] / "posts" / f"{meta['slug']}.md"
     if target.exists() and not force:
-        existing, _ = split_front_matter(target.read_text(encoding="utf-8"))
-        if existing.get("item") != item_id:
+        existing, _ = split_front_matter(target.read_text(encoding="utf-8"), target)
+        owner = existing.get("item")
+        if owner is None:
             raise PublishError(
                 f"{target} was not produced by this pipeline "
-                f"(item marker: {existing.get('item')!r}); "
+                "(it carries no item marker, so it is hand-written content); "
                 "refusing to overwrite. Pass --force to replace it."
+            )
+        if owner != item_id:
+            raise PublishError(
+                f"{target} already belongs to a different item ({owner!r}); "
+                "refusing to overwrite. Change this item's slug, or pass "
+                "--force to take the slug over."
             )
     return final, target
 
 
 def write_language(meta, lang, item_id, final, target):
     """Write one validated language into the content tree."""
-    found, body = split_front_matter(final.read_text(encoding="utf-8"))
+    found, body = split_front_matter(final.read_text(encoding="utf-8"), final)
     if found:
         print(
             f"warning: ignoring front matter in {final}; "
@@ -111,6 +131,53 @@ def write_language(meta, lang, item_id, final, target):
         encoding="utf-8",
     )
     return target
+
+
+def find_orphans(item_id, meta, content_root):
+    """Published files still marked as this item's that no longer belong.
+
+    Renaming an item's slug, or dropping a language from `languages`, leaves
+    the previously published file in `content/` where it keeps deploying.
+
+    Both language directories are scanned regardless of what the item declares
+    now, since a dropped language is exactly the case a declared-only scan
+    would miss. A file counts as current whenever its language is still
+    declared and its path is the one the current slug maps to — whether or not
+    this run rewrote it. Publishing one language of a two-language item is a
+    supported workflow, so "not written this run" must never mean "orphan".
+    """
+    declared = set(meta["languages"])
+    orphans = []
+    for lang, dir_name in LANG_DIRS.items():
+        posts = content_root / dir_name / "posts"
+        if not posts.is_dir():
+            continue
+        expected = posts / f"{meta['slug']}.md"
+        for path in sorted(posts.glob("*.md")):
+            try:
+                existing, _ = split_front_matter(
+                    path.read_text(encoding="utf-8"), path
+                )
+            except (FrontMatterError, UnicodeDecodeError):
+                continue  # not ours to judge; publishing already succeeded
+            if existing.get("item") != item_id:
+                continue
+            if lang not in declared:
+                orphans.append((path, f"language {lang!r} is no longer declared"))
+            elif path != expected:
+                orphans.append((path, f"the slug is now {meta['slug']!r}"))
+    return orphans
+
+
+def warn_orphans(item_id, meta, content_root):
+    """Report orphaned published files on stderr. Never fails the publish."""
+    for path, reason in find_orphans(item_id, meta, content_root):
+        print(
+            f"warning: {path} still carries this item's marker but "
+            f"{reason}; publish no longer writes it. Delete it by hand if it "
+            "should no longer be on the site.",
+            file=sys.stderr,
+        )
 
 
 def main(argv=None):
@@ -154,11 +221,12 @@ def main(argv=None):
             write_language(meta, lang, args.item_id, final, target)
             for lang, final, target in planned
         ]
-    except PublishError as exc:
+    except (PublishError, FrontMatterError) as exc:
         sys.exit(f"error: {exc}")
 
     for target in written:
         print(f"published {target}")
+    warn_orphans(args.item_id, meta, content_root)
     print("next: set stage to published in state.md, then commit and push")
     return 0
 

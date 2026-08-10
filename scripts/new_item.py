@@ -9,6 +9,9 @@ import re
 import sys
 from pathlib import Path
 
+# SLUG_RE and KNOWN_LANGS are deliberately duplicated from publish.py. This
+# script must keep working without PyYAML, so it imports neither frontmatter.py
+# nor publish.py. Do not "fix" the duplication with a shared module.
 SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 KNOWN_LANGS = ("ko", "en")
 TEMPLATE_FILES = ("planning.md", "state.md", "publish.md", "manner.md")
@@ -104,6 +107,10 @@ def main(argv=None):
         sys.exit(f"error: invalid date {date!r}: expected YYYY-MM-DD")
 
     langs = [lang.strip() for lang in args.lang.split(",") if lang.strip()]
+    # Dedupe here, before any directory is made: `--lang ko,ko` would otherwise
+    # hit FileExistsError halfway through and leave a half-built item that makes
+    # every retry fail with "item already exists".
+    langs = list(dict.fromkeys(langs))
     if not langs:
         sys.exit("error: --lang must name at least one language")
 

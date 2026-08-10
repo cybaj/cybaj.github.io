@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """End-to-end tests for the writing pipeline scripts."""
 
+import os
 import shutil
 import subprocess
 import sys
@@ -11,6 +12,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 NEW_ITEM = REPO / "scripts" / "new_item.py"
 PUBLISH = REPO / "scripts" / "publish.py"
+
+sys.path.insert(0, str(REPO / "scripts"))
+
+from frontmatter import FrontMatterError, split_front_matter  # noqa: E402
 
 
 def run(script, *args):
@@ -91,26 +96,47 @@ class NewItemTest(PipelineTest):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("invalid tag", result.stderr)
 
+    def test_duplicate_language_does_not_wedge_the_item(self):
+        """`--lang ko,ko` used to half-build the item and block every retry."""
+        result = self.new("hugo-pipeline", langs="ko,ko")
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        item = self.item_dir("2026-08-10-hugo-pipeline")
+        self.assertTrue((item / "docs" / "ko").is_dir())
+        self.assertTrue((item / "editing" / "ko").is_dir())
+        text = (item / "publish.md").read_text(encoding="utf-8")
+        self.assertIn("languages: [ko]", text)
+        self.assertEqual(text.count('ko: ""'), 1)
+        self.assertEqual(
+            (item / "state.md").read_text(encoding="utf-8").count("ko: not-started"), 1
+        )
+
+    def test_state_template_carries_the_stage_vocabulary(self):
+        self.new("hugo-pipeline")
+        text = (self.item_dir("2026-08-10-hugo-pipeline") / "state.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("not-started | drafting | editing | done", text)
+
     def test_rejects_unknown_language(self):
         result = self.new("hugo-pipeline", langs="ko,fr")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("unknown language", result.stderr)
 
 
-class PublishTest(PipelineTest):
+class PublishFixture(PipelineTest):
+    """Helpers shared by the publishing tests. Holds no tests of its own."""
+
     ITEM = "2026-08-10-hugo-pipeline"
 
-    def prepare(self, langs="ko", titles=None, bodies=None):
-        """Scaffold an item and fill in what publishing requires."""
-        self.new("hugo-pipeline", langs=langs)
+    def write_publish_md(self, langs="ko", slug="hugo-pipeline", titles=None):
+        """(Re)write publish.md, the metadata publishing reads."""
         lang_list = langs.split(",")
         titles = titles or {"ko": "한국어 제목", "en": "English Title"}
-        bodies = bodies or {lang: f"# body {lang}\n" for lang in lang_list}
-
         title_block = "\n".join(f'  {l}: "{titles[l]}"' for l in lang_list)
         (self.item_dir(self.ITEM) / "publish.md").write_text(
             "---\n"
-            "slug: hugo-pipeline\n"
+            f"slug: {slug}\n"
             f"languages: [{', '.join(lang_list)}]\n"
             "date: 2026-08-10\n"
             "tags: [hugo, blogging]\n"
@@ -119,6 +145,13 @@ class PublishTest(PipelineTest):
             "---\n\n## Publish notes\n",
             encoding="utf-8",
         )
+
+    def prepare(self, langs="ko", titles=None, bodies=None):
+        """Scaffold an item and fill in what publishing requires."""
+        self.new("hugo-pipeline", langs=langs)
+        lang_list = langs.split(",")
+        bodies = bodies or {lang: f"# body {lang}\n" for lang in lang_list}
+        self.write_publish_md(langs=langs, titles=titles)
         for lang in lang_list:
             if lang in bodies:
                 (self.item_dir(self.ITEM) / "editing" / lang / "final.md").write_text(
@@ -128,9 +161,11 @@ class PublishTest(PipelineTest):
     def publish(self, *extra):
         return run(PUBLISH, self.ITEM, "--root", self.tmp, *extra)
 
-    def published(self, lang_dir):
-        return self.tmp / "content" / lang_dir / "posts" / "hugo-pipeline.md"
+    def published(self, lang_dir, slug="hugo-pipeline"):
+        return self.tmp / "content" / lang_dir / "posts" / f"{slug}.md"
 
+
+class PublishTest(PublishFixture):
     def test_publishes_single_language(self):
         self.prepare(langs="ko")
         result = self.publish()
@@ -228,7 +263,21 @@ class PublishTest(PipelineTest):
         result = self.publish()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("not produced by this pipeline", result.stderr)
+        self.assertIn("no item marker", result.stderr)
         self.assertIn("손으로 쓴 글", self.published("korean").read_text(encoding="utf-8"))
+
+    def test_refusal_distinguishes_another_items_slug(self):
+        """A file this pipeline wrote for a different item is not hand-written."""
+        self.prepare(langs="ko")
+        self.published("korean").write_text(
+            "---\ntitle: 다른 항목\nitem: 2026-01-01-other\n---\n\nbody\n",
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("belongs to a different item", result.stderr)
+        self.assertIn("2026-01-01-other", result.stderr)
+        self.assertNotIn("hand-written", result.stderr)
 
     def test_force_overwrites_handwritten_content(self):
         self.prepare(langs="ko")
@@ -238,6 +287,161 @@ class PublishTest(PipelineTest):
         result = self.publish("--force")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("한국어 제목", self.published("korean").read_text(encoding="utf-8"))
+
+
+class MalformedMetadataTest(PublishFixture):
+    """Hand-edited front matter is the likeliest breakage; it must read well."""
+
+    def test_malformed_yaml_reports_the_file_without_a_traceback(self):
+        self.prepare(langs="ko")
+        path = self.item_dir(self.ITEM) / "publish.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                'ko: "한국어 제목"', 'ko: "한국어 제목'
+            ),
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("error:", result.stderr)
+        self.assertIn("publish.md", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertNotIn("yaml.scanner", result.stderr)
+        self.assertFalse(self.published("korean").exists())
+
+    def test_title_as_a_plain_string_fails_cleanly(self):
+        self.prepare(langs="ko")
+        path = self.item_dir(self.ITEM) / "publish.md"
+        path.write_text(
+            "---\n"
+            "slug: hugo-pipeline\n"
+            "languages: [ko]\n"
+            "date: 2026-08-10\n"
+            'title: "just a string"\n'
+            "---\n\n## Publish notes\n",
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("error:", result.stderr)
+        self.assertIn("title", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertFalse(self.published("korean").exists())
+
+
+class SelectiveLanguageTest(PublishFixture):
+    def test_publishes_one_language_while_the_other_drafts(self):
+        """The supported half-finished workflow: ship ko, keep drafting en."""
+        self.prepare(langs="ko,en", bodies={"ko": "# body ko\n"})
+        result = self.publish("--lang", "ko")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("한국어 제목", self.published("korean").read_text(encoding="utf-8"))
+        self.assertFalse(self.published("english").exists())
+        self.assertNotIn("warning", result.stderr)
+
+
+class OrphanWarningTest(PublishFixture):
+    def test_renamed_slug_warns_and_still_succeeds(self):
+        self.prepare(langs="ko")
+        self.assertEqual(self.publish().returncode, 0)
+
+        self.write_publish_md(langs="ko", slug="renamed-pipeline")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(self.published("korean", "renamed-pipeline").is_file())
+        self.assertIn("warning", result.stderr)
+        self.assertIn(str(self.published("korean")), result.stderr)
+        self.assertIn("renamed-pipeline", result.stderr)
+
+    def test_dropped_language_warns(self):
+        self.prepare(langs="ko,en")
+        self.assertEqual(self.publish().returncode, 0)
+
+        self.write_publish_md(langs="ko")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("warning", result.stderr)
+        self.assertIn(str(self.published("english")), result.stderr)
+        self.assertIn("'en'", result.stderr)
+        self.assertTrue(self.published("english").is_file(), "must not delete")
+
+    def test_selective_publish_of_a_published_item_warns_about_nothing(self):
+        """The false positive to avoid: `--lang ko` does not orphan English."""
+        self.prepare(langs="ko,en")
+        self.assertEqual(self.publish().returncode, 0)
+
+        result = self.publish("--lang", "ko")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+
+    def test_unrelated_items_are_never_orphans(self):
+        self.prepare(langs="ko")
+        self.published("korean", "someone-else").write_text(
+            "---\ntitle: 남의 글\nitem: 2026-01-01-other\n---\n\nbody\n",
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+
+
+class FrontMatterTest(unittest.TestCase):
+    def test_body_opening_with_a_horizontal_rule_is_not_metadata(self):
+        text = "---\n\nIntro paragraph that matters.\n\n---\n\nRest.\n"
+        meta, body = split_front_matter(text)
+        self.assertEqual(meta, {})
+        self.assertEqual(body, text, "content before the second --- was dropped")
+
+    def test_real_front_matter_still_splits(self):
+        meta, body = split_front_matter("---\ntitle: 제목\n---\n\nbody\n")
+        self.assertEqual(meta, {"title": "제목"})
+        self.assertEqual(body, "body\n")
+
+    def test_malformed_yaml_raises_a_named_error(self):
+        with self.assertRaises(FrontMatterError) as caught:
+            split_front_matter('---\ntitle: "제목\n---\n\nbody\n', "publish.md")
+        message = str(caught.exception)
+        self.assertIn("publish.md", message)
+        self.assertRegex(message, r"line \d+", "must point at the offending line")
+        self.assertEqual(message, message.strip().replace("\n", " "))
+
+
+class MakefileTest(unittest.TestCase):
+    """The Makefile is user interface too: check what it passes through."""
+
+    def make_n(self, *args, env=None):
+        make = shutil.which("make")
+        if make is None:  # pragma: no cover - depends on the machine
+            self.skipTest("make is not installed")
+        result = subprocess.run(
+            [make, "-n", *args],
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+            env={**os.environ, **(env or {})},
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
+
+    def test_force_0_does_not_force(self):
+        self.assertNotIn("--force", self.make_n("publish", "ITEM=x", "FORCE=0"))
+        self.assertNotIn("--force", self.make_n("publish", "ITEM=x", "FORCE=no"))
+        self.assertNotIn("--force", self.make_n("publish", "ITEM=x", "FORCE=false"))
+
+    def test_force_1_forces(self):
+        self.assertIn("--force", self.make_n("publish", "ITEM=x", "FORCE=1"))
+
+    def test_langs_reaches_new_item(self):
+        self.assertIn('--lang "ko,en"', self.make_n("new", "TAG=x", "LANGS=ko,en"))
+
+    def test_bare_new_passes_no_language(self):
+        self.assertNotIn("--lang", self.make_n("new", "TAG=x"))
+
+    def test_the_locale_variable_no_longer_leaks_in(self):
+        """The rename to LANGS is what makes this safe without a reset."""
+        env = {"LANG": "C.UTF-8"}
+        self.assertNotIn("--lang", self.make_n("new", "TAG=x", env=env))
+        self.assertNotIn("--lang", self.make_n("publish", "ITEM=x", env=env))
 
 
 if __name__ == "__main__":

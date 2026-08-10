@@ -1,6 +1,6 @@
 ---
 stage: planning
-languages:
+languages:  # per language: not-started | drafting | editing | done
 {{LANGUAGE_STATES}}
 updated: {{DATE}}
 ---

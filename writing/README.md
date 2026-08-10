@@ -57,8 +57,8 @@ Whoever advances the item updates `state.md`, human or agent.
 **1. Create the item.**
 
 ```bash
-make new TAG=hugo-pipeline              # Korean only
-make new TAG=hugo-pipeline LANG=ko,en   # both languages
+make new TAG=hugo-pipeline               # Korean only
+make new TAG=hugo-pipeline LANGS=ko,en   # both languages
 ```
 
 **2. Plan.** Fill in `planning.md` and `manner.md`. `manner.md` matters more
@@ -96,6 +96,29 @@ This writes `content/{korean,english}/posts/{slug}.md` for every declared
 language. Re-running overwrites, so fixing a typo is edit-and-republish. Then
 commit and push; CI builds and deploys to GitHub Pages.
 
+`LANGS` publishes one language instead of all of them — that is how you ship
+the Korean post while the English one is still being drafted:
+
+```bash
+make publish ITEM=2026-08-10-hugo-pipeline LANGS=ko
+```
+
+(`LANGS` takes a comma list for `new`, which creates a directory per language,
+and a single language for `publish`, which publishes one at a time.)
+
+`FORCE=1` overwrites content in `content/` that this pipeline does not own —
+a hand-written post, or one belonging to another item. It is how you take a
+slug over, and it destroys what was there:
+
+```bash
+make publish ITEM=2026-08-10-hugo-pipeline FORCE=1
+```
+
+Renaming a `slug`, or dropping a language from `languages`, leaves the file
+already published under the old name sitting in `content/`, still deploying.
+Publishing warns about every such orphan by name; the publish itself still
+succeeds, and deleting the old file is your call.
+
 ## Publish metadata
 
 `publish.md` front matter is the single source of truth for everything Hugo
@@ -118,10 +141,19 @@ for every declared language. Optional: `tags`, `categories`, `author`, `draft`.
 
 Generated files carry `item: {item-id}` in their front matter. That marker is
 how `publish.py` recognizes files it owns; it refuses to overwrite hand-written
-content in `content/` unless given `--force`.
+content in `content/` unless given `--force` (`FORCE=1` through `make`).
 
 ## Languages
 
 An item declares its own languages. `[ko]` is a perfectly good item — the
 English side is simply never created. Adding `en` later means adding it to
 `languages`, adding a `title.en`, and creating `docs/en/` and `editing/en/`.
+
+## Tests
+
+```bash
+make test
+```
+
+Runs `scripts/test_pipeline.py`, which scaffolds and publishes items end to end
+in a temporary directory. It touches nothing under `writing/` or `content/`.
