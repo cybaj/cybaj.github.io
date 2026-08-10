@@ -169,9 +169,14 @@ class PublishTest(PipelineTest):
         self.assertIn("'en'", result.stderr)
 
     def test_partial_failure_writes_nothing(self):
-        """A half-publishable item must not half-publish."""
+        """A half-publishable item must not half-publish.
+
+        The returncode assertion matters: without it this test cannot tell
+        a correct refusal from a publish.py that silently did nothing.
+        """
         self.prepare(langs="ko,en", bodies={"ko": "# body ko\n"})
-        self.publish()
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
         self.assertFalse(self.published("korean").exists())
         self.assertFalse(self.published("english").exists())
 
