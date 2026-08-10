@@ -97,5 +97,143 @@ class NewItemTest(PipelineTest):
         self.assertIn("unknown language", result.stderr)
 
 
+class PublishTest(PipelineTest):
+    ITEM = "2026-08-10-hugo-pipeline"
+
+    def prepare(self, langs="ko", titles=None, bodies=None):
+        """Scaffold an item and fill in what publishing requires."""
+        self.new("hugo-pipeline", langs=langs)
+        lang_list = langs.split(",")
+        titles = titles or {"ko": "한국어 제목", "en": "English Title"}
+        bodies = bodies or {lang: f"# body {lang}\n" for lang in lang_list}
+
+        title_block = "\n".join(f'  {l}: "{titles[l]}"' for l in lang_list)
+        (self.item_dir(self.ITEM) / "publish.md").write_text(
+            "---\n"
+            "slug: hugo-pipeline\n"
+            f"languages: [{', '.join(lang_list)}]\n"
+            "date: 2026-08-10\n"
+            "tags: [hugo, blogging]\n"
+            "title:\n"
+            f"{title_block}\n"
+            "---\n\n## Publish notes\n",
+            encoding="utf-8",
+        )
+        for lang in lang_list:
+            if lang in bodies:
+                (self.item_dir(self.ITEM) / "editing" / lang / "final.md").write_text(
+                    bodies[lang], encoding="utf-8"
+                )
+
+    def publish(self, *extra):
+        return run(PUBLISH, self.ITEM, "--root", self.tmp, *extra)
+
+    def published(self, lang_dir):
+        return self.tmp / "content" / lang_dir / "posts" / "hugo-pipeline.md"
+
+    def test_publishes_single_language(self):
+        self.prepare(langs="ko")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        text = self.published("korean").read_text(encoding="utf-8")
+        self.assertIn("한국어 제목", text)
+        self.assertIn("item: 2026-08-10-hugo-pipeline", text)
+        self.assertIn("# body ko", text)
+        self.assertFalse(self.published("english").exists())
+
+    def test_does_not_escape_korean(self):
+        self.prepare(langs="ko")
+        self.publish()
+        text = self.published("korean").read_text(encoding="utf-8")
+        self.assertNotIn("\\u", text)
+
+    def test_publishes_both_languages(self):
+        self.prepare(langs="ko,en")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("한국어 제목", self.published("korean").read_text(encoding="utf-8"))
+        self.assertIn("English Title", self.published("english").read_text(encoding="utf-8"))
+
+    def test_is_idempotent(self):
+        self.prepare(langs="ko")
+        self.publish()
+        first = self.published("korean").read_text(encoding="utf-8")
+        self.publish()
+        self.assertEqual(first, self.published("korean").read_text(encoding="utf-8"))
+
+    def test_missing_final_names_the_language(self):
+        self.prepare(langs="ko,en", bodies={"ko": "# body ko\n"})
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("'en'", result.stderr)
+
+    def test_partial_failure_writes_nothing(self):
+        """A half-publishable item must not half-publish."""
+        self.prepare(langs="ko,en", bodies={"ko": "# body ko\n"})
+        self.publish()
+        self.assertFalse(self.published("korean").exists())
+        self.assertFalse(self.published("english").exists())
+
+    def test_missing_required_field_fails(self):
+        self.prepare(langs="ko")
+        (self.item_dir(self.ITEM) / "publish.md").write_text(
+            "---\nlanguages: [ko]\ndate: 2026-08-10\ntitle:\n  ko: \"제목\"\n---\n",
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("slug", result.stderr)
+
+    def test_unfilled_title_fails(self):
+        self.prepare(langs="ko", titles={"ko": ""})
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("title", result.stderr)
+
+    def test_invalid_slug_fails(self):
+        self.prepare(langs="ko")
+        path = self.item_dir(self.ITEM) / "publish.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "slug: hugo-pipeline", "slug: Hugo Pipeline"
+            ),
+            encoding="utf-8",
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("slug", result.stderr)
+
+    def test_undeclared_language_fails(self):
+        self.prepare(langs="ko")
+        result = self.publish("--lang", "en")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not declared", result.stderr)
+
+    def test_missing_item_fails(self):
+        result = run(PUBLISH, "2026-01-01-nope", "--root", self.tmp)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("item not found", result.stderr)
+
+    def test_refuses_to_clobber_handwritten_content(self):
+        self.prepare(langs="ko")
+        self.published("korean").write_text(
+            "---\ntitle: 손으로 쓴 글\n---\n\nbody\n", encoding="utf-8"
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not produced by this pipeline", result.stderr)
+        self.assertIn("손으로 쓴 글", self.published("korean").read_text(encoding="utf-8"))
+
+    def test_force_overwrites_handwritten_content(self):
+        self.prepare(langs="ko")
+        self.published("korean").write_text(
+            "---\ntitle: 손으로 쓴 글\n---\n\nbody\n", encoding="utf-8"
+        )
+        result = self.publish("--force")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("한국어 제목", self.published("korean").read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
