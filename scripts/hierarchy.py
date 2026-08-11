@@ -42,7 +42,18 @@ def load_structure(item_dir):
             f"{path}: sections must be a map of section path to its settings, "
             f"not a bare {type(sections).__name__}"
         )
-    return {str(key): (value or {}) for key, value in sections.items()}
+    resolved = {}
+    for key, value in sections.items():
+        section = str(key)
+        value = value or {}
+        if not isinstance(value, dict):
+            raise HierarchyError(
+                f"{path}: section {section!r} must be a map of settings "
+                f"(title, weight, or a theme flag), not a bare "
+                f"{type(value).__name__}"
+            )
+        resolved[section] = value
+    return resolved
 
 
 def walk_editing_tree(lang_dir):

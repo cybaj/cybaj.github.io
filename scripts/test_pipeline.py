@@ -496,6 +496,13 @@ class HierarchyTest(unittest.TestCase):
             hierarchy.load_structure(self.tmp)
         self.assertIn("map", str(caught.exception))
 
+    def test_structure_rejects_a_non_map_section_entry(self):
+        """`templates: 20` — forgetting to nest weight: — must not crash."""
+        self.write_structure("---\nsections:\n  templates: 20\n---\n")
+        with self.assertRaises(hierarchy.HierarchyError) as caught:
+            hierarchy.load_structure(self.tmp)
+        self.assertIn("templates", str(caught.exception))
+
     def test_declared_section_without_a_directory_is_an_error(self):
         with self.assertRaises(hierarchy.HierarchyError) as caught:
             hierarchy.validate_sections({"typo": {}}, ["", "templates"], "structure.md")
@@ -508,6 +515,15 @@ class HierarchyTest(unittest.TestCase):
         )
         self.assertEqual(front["title"], "템플릿")
         self.assertFalse(fell_back)
+
+    def test_a_title_omitting_this_language_falls_back(self):
+        """A title declared for en only must still fall back for ko."""
+        overrides = {"templates": {"title": {"en": "Templates"}}}
+        front, fell_back = hierarchy.resolve_section_meta(
+            "templates", overrides, "ko", "아이템 제목", "structure.md"
+        )
+        self.assertEqual(front["title"], "templates")
+        self.assertTrue(fell_back)
 
     def test_root_section_falls_back_to_the_item_title(self):
         front, fell_back = hierarchy.resolve_section_meta(
