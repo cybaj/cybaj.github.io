@@ -10,12 +10,13 @@ serve:
 # publishes one at a time. (It is LANGS, not LANG, because Make auto-imports
 # the environment and LANG is the POSIX locale variable.)
 
-# make new TAG=hugo-pipeline [LANGS=ko,en] [DATE=2026-08-10]
+# make new TAG=hugo-pipeline [LANGS=ko,en] [DATE=2026-08-10] [TARGET=docs]
 new:
-	@test -n "$(TAG)" || { echo "usage: make new TAG=<tag> [LANGS=ko,en] [DATE=YYYY-MM-DD]"; exit 1; }
+	@test -n "$(TAG)" || { echo "usage: make new TAG=<tag> [LANGS=ko,en] [DATE=YYYY-MM-DD] [TARGET=docs]"; exit 1; }
 	python3 scripts/new_item.py "$(TAG)" \
 		$(if $(LANGS),--lang "$(LANGS)",) \
-		$(if $(DATE),--date "$(DATE)",)
+		$(if $(DATE),--date "$(DATE)",) \
+		$(if $(TARGET),--target $(TARGET),)
 
 # make publish ITEM=2026-08-10-hugo-pipeline [LANGS=ko] [FORCE=1]
 publish:

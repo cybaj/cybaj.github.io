@@ -15,14 +15,15 @@ from pathlib import Path
 SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 KNOWN_LANGS = ("ko", "en")
 TEMPLATE_FILES = ("planning.md", "state.md", "publish.md", "manner.md")
+KNOWN_TARGETS = ("posts", "docs")
 
 
 class ItemError(Exception):
     """A problem the author can fix, reported without a traceback."""
 
 
-def render(text, item_id, date, tag, langs):
-    """Substitute the six template placeholders.
+def render(text, item_id, date, tag, langs, target="posts"):
+    """Substitute the seven template placeholders.
 
     The slug defaults to the tag, so `{{SLUG}}` covers both; there is no
     separate `{{TAG}}` token.
@@ -36,10 +37,11 @@ def render(text, item_id, date, tag, langs):
         .replace("{{LANGUAGES}}", ", ".join(langs))
         .replace("{{LANGUAGE_STATES}}", language_states)
         .replace("{{TITLE_ENTRIES}}", title_entries)
+        .replace("{{TARGET_LINE}}", "target: docs\n" if target == "docs" else "")
     )
 
 
-def create_item(root, tag, date, langs):
+def create_item(root, tag, date, langs, target="posts"):
     if not SLUG_RE.match(tag):
         raise ItemError(
             f"invalid tag {tag!r}: must match {SLUG_RE.pattern} "
@@ -50,6 +52,10 @@ def create_item(root, tag, date, langs):
         raise ItemError(
             f"unknown language(s): {', '.join(unknown)}; "
             f"known: {', '.join(KNOWN_LANGS)}"
+        )
+    if target not in KNOWN_TARGETS:
+        raise ItemError(
+            f"unknown target {target!r}; known: {', '.join(KNOWN_TARGETS)}"
         )
 
     item_id = f"{date}-{tag}"
@@ -64,7 +70,7 @@ def create_item(root, tag, date, langs):
         if not src.is_file():
             raise ItemError(f"missing template: {src}")
         rendered[name] = render(
-            src.read_text(encoding="utf-8"), item_id, date, tag, langs
+            src.read_text(encoding="utf-8"), item_id, date, tag, langs, target
         )
 
     for lang in langs:
@@ -75,6 +81,15 @@ def create_item(root, tag, date, langs):
         (item_dir / sub / ".gitkeep").touch()
     for name, text in rendered.items():
         (item_dir / name).write_text(text, encoding="utf-8")
+
+    if target == "docs":
+        src = templates / "structure.md"
+        if not src.is_file():
+            raise ItemError(f"missing template: {src}")
+        (item_dir / "structure.md").write_text(
+            render(src.read_text(encoding="utf-8"), item_id, date, tag, langs, target),
+            encoding="utf-8",
+        )
 
     return item_dir
 
@@ -91,6 +106,11 @@ def main(argv=None):
     )
     parser.add_argument(
         "--date", default=None, help="item date, YYYY-MM-DD (default: today)"
+    )
+    parser.add_argument(
+        "--target",
+        default="posts",
+        help="posts for a flat blog post, docs for a document tree (default: posts)",
     )
     parser.add_argument(
         "--root",
@@ -115,7 +135,7 @@ def main(argv=None):
         sys.exit("error: --lang must name at least one language")
 
     try:
-        item_dir = create_item(args.root, args.tag, date, langs)
+        item_dir = create_item(args.root, args.tag, date, langs, args.target)
     except ItemError as exc:
         sys.exit(f"error: {exc}")
 

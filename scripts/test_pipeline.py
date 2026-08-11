@@ -444,6 +444,12 @@ class MakefileTest(unittest.TestCase):
         self.assertNotIn("--lang", self.make_n("new", "TAG=x", env=env))
         self.assertNotIn("--lang", self.make_n("publish", "ITEM=x", env=env))
 
+    def test_target_reaches_new_item(self):
+        self.assertIn("--target docs", self.make_n("new", "TAG=x", "TARGET=docs"))
+
+    def test_bare_new_passes_no_target(self):
+        self.assertNotIn("--target", self.make_n("new", "TAG=x"))
+
 
 class HierarchyTest(unittest.TestCase):
     def setUp(self):
@@ -872,6 +878,60 @@ class TreeOrphanTest(DocsFixture):
         result = self.publish("--lang", "ko")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr, "")
+
+
+class TargetScaffoldTest(PipelineTest):
+    def new_with_target(self, tag, target):
+        return run(
+            NEW_ITEM, tag, "--lang", "ko", "--date", "2026-08-10",
+            "--target", target, "--root", self.tmp,
+        )
+
+    def test_docs_item_declares_its_target(self):
+        result = self.new_with_target("hugo-guide", "docs")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        text = (self.item_dir("2026-08-10-hugo-guide") / "publish.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("target: docs", text)
+
+    def test_docs_item_scaffolds_structure_md(self):
+        self.new_with_target("hugo-guide", "docs")
+        path = self.item_dir("2026-08-10-hugo-guide") / "structure.md"
+        self.assertTrue(path.is_file())
+        self.assertIn("sections:", path.read_text(encoding="utf-8"))
+
+    def test_posts_item_has_no_structure_md(self):
+        self.new_with_target("hugo-pipeline", "posts")
+        item = self.item_dir("2026-08-10-hugo-pipeline")
+        self.assertFalse((item / "structure.md").exists())
+
+    def test_default_target_is_posts(self):
+        self.new("hugo-pipeline", langs="ko")
+        item = self.item_dir("2026-08-10-hugo-pipeline")
+        self.assertFalse((item / "structure.md").exists())
+        self.assertNotIn("target:", (item / "publish.md").read_text(encoding="utf-8"))
+
+    def test_unknown_target_is_rejected(self):
+        result = self.new_with_target("hugo-guide", "wiki")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("wiki", result.stderr)
+
+    def test_no_unrendered_placeholder_in_structure(self):
+        self.new_with_target("hugo-guide", "docs")
+        text = (self.item_dir("2026-08-10-hugo-guide") / "structure.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("{{", text)
+
+    def test_the_target_token_renders_away_for_a_posts_item(self):
+        """{{TARGET_LINE}} must vanish, not linger, on a posts item."""
+        self.new_with_target("hugo-pipeline", "posts")
+        text = (self.item_dir("2026-08-10-hugo-pipeline") / "publish.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("{{", text)
+        self.assertTrue(text.startswith("---\nslug: hugo-pipeline\n"))
 
 
 if __name__ == "__main__":

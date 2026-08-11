@@ -1,5 +1,5 @@
 ---
-slug: {{SLUG}}
+{{TARGET_LINE}}slug: {{SLUG}}
 languages: [{{LANGUAGES}}]
 date: {{DATE}}
 tags: []
