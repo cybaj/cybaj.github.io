@@ -19,11 +19,12 @@ from frontmatter import split_front_matter  # noqa: E402
 
 SECTION_FILE = "_index.md"
 
-# One file publish.py will write. `source` is the editing file to take a body
-# from, or None for a generated section page with no body. `front` carries
-# resolved section metadata for section pages, and is None for leaves, whose
-# front matter is merged from the file itself at write time.
-Write = namedtuple("Write", "source target front")
+# One file publish.py will write, fully resolved during planning. `source` is
+# the editing file the body came from, or None for a generated section page
+# with no body; it names the file in warnings and errors. `front` and `body`
+# are the finished front matter and body, so writing is formatting only and
+# cannot fail partway through a publish.
+Write = namedtuple("Write", "source target front body")
 
 
 class HierarchyError(Exception):

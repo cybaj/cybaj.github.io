@@ -141,54 +141,67 @@ def merge_leaf_front_matter(meta, item_id, own, body, source):
     return front, fell_back
 
 
-def resolve_language(item_dir, item_id, meta, lang, content_root, force):
-    """Validate one language, returning the (source, target) pair to write.
+def check_ownership(target, item_id, force):
+    """Refuse to overwrite a published file this item does not own.
 
-    Validation is separated from writing so that every language can be checked
-    before any file is written. A two-language item with one unfinished draft
-    must fail without half-publishing the other.
+    Every planned write passes through here — flat post, leaf and generated
+    section page alike. A section page is published content like any other;
+    exempting it let publishing destroy a hand-written `_index.md`, and let two
+    `docs` items sharing a slug take over each other's sections, in silence.
     """
-    final = item_dir / "editing" / lang / "final.md"
-    if not final.is_file():
+    if force or not target.exists():
+        return
+    existing, _ = split_front_matter(target.read_text(encoding="utf-8"), target)
+    owner = existing.get("item")
+    if owner is None:
         raise PublishError(
-            f"no finished draft for language {lang!r}: expected {final}"
+            f"{target} was not produced by this pipeline "
+            "(it carries no item marker, so it is hand-written content); "
+            "refusing to overwrite. Pass --force to replace it."
+        )
+    if owner != item_id:
+        raise PublishError(
+            f"{target} already belongs to a different item ({owner!r}); "
+            "refusing to overwrite. Change this item's slug, or pass "
+            "--force to take the slug over."
         )
 
-    target = content_root / LANG_DIRS[lang] / "posts" / f"{meta['slug']}.md"
-    if target.exists() and not force:
-        existing, _ = split_front_matter(target.read_text(encoding="utf-8"), target)
-        owner = existing.get("item")
-        if owner is None:
+
+def read_source(source):
+    """One editing file's (own front matter, body); ({}, "") for no file."""
+    if source is None:
+        return {}, ""
+    return split_front_matter(source.read_text(encoding="utf-8"), source)
+
+
+def plan_posts(item_dir, item_id, meta, langs, content_root):
+    """Plan the flat post each language publishes.
+
+    Planning reads and parses every source, so that a missing draft or a
+    malformed one fails before the first file is written. A two-language item
+    with one unfinished draft must fail without half-publishing the other.
+    """
+    writes = []
+    for lang in langs:
+        final = item_dir / "editing" / lang / "final.md"
+        if not final.is_file():
             raise PublishError(
-                f"{target} was not produced by this pipeline "
-                "(it carries no item marker, so it is hand-written content); "
-                "refusing to overwrite. Pass --force to replace it."
+                f"no finished draft for language {lang!r}: expected {final}"
             )
-        if owner != item_id:
-            raise PublishError(
-                f"{target} already belongs to a different item ({owner!r}); "
-                "refusing to overwrite. Change this item's slug, or pass "
-                "--force to take the slug over."
+        found, body = read_source(final)
+        if found:
+            print(
+                f"warning: ignoring front matter in {final}; "
+                "publish.md is the source of truth",
+                file=sys.stderr,
             )
-    return final, target
-
-
-def write_language(meta, lang, item_id, final, target):
-    """Write one validated language into the content tree."""
-    found, body = split_front_matter(final.read_text(encoding="utf-8"), final)
-    if found:
-        print(
-            f"warning: ignoring front matter in {final}; "
-            "publish.md is the source of truth",
-            file=sys.stderr,
-        )
-
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(
-        dump_front_matter(build_front_matter(meta, lang, item_id), body),
-        encoding="utf-8",
-    )
-    return target
+        writes.append(Write(
+            source=final,
+            target=content_root / LANG_DIRS[lang] / "posts" / f"{meta['slug']}.md",
+            front=build_front_matter(meta, lang, item_id),
+            body=body,
+        ))
+    return writes
 
 
 def section_union(item_dir, meta):
@@ -209,99 +222,105 @@ def section_union(item_dir, meta):
     return sorted(union)
 
 
-def resolve_docs_language(item_dir, item_id, meta, lang, content_root, force):
-    """Validate one language's subtree, returning the writes it implies.
+def merge_section_front_matter(resolved, own, meta, item_id):
+    """Front matter for one section page: resolved metadata over its own keys.
 
-    Section pages are added by `plan_sections`; this returns leaves only.
+    `structure.md` outranks a hand-written `_index.md`: the section page's own
+    front matter fills gaps only, since one place must decide the sidebar.
     """
-    lang_dir = item_dir / "editing" / lang
-    leaves, _, _ = (
-        hierarchy.walk_editing_tree(lang_dir) if lang_dir.is_dir() else ([], {}, [""])
-    )
-    if not leaves:
-        raise PublishError(
-            f"no documents for language {lang!r}: expected at least one .md "
-            f"file under {lang_dir}"
-        )
-
-    root = docs_root(content_root, lang, meta["slug"])
-    writes = []
-    for rel in leaves:
-        target = root / rel
-        if target.exists() and not force:
-            existing, _ = split_front_matter(
-                target.read_text(encoding="utf-8"), target
-            )
-            owner = existing.get("item")
-            if owner is None:
-                raise PublishError(
-                    f"{target} was not produced by this pipeline "
-                    "(it carries no item marker, so it is hand-written content); "
-                    "refusing to overwrite. Pass --force to replace it."
-                )
-            if owner != item_id:
-                raise PublishError(
-                    f"{target} already belongs to a different item ({owner!r}); "
-                    "refusing to overwrite. Change this item's slug, or pass "
-                    "--force to take the slug over."
-                )
-        writes.append(Write(source=lang_dir / rel, target=target, front=None))
-    return writes
+    front = dict(resolved)
+    for key, value in own.items():
+        if key not in ("item", "title"):
+            front.setdefault(key, value)
+    front["date"] = front.get("date", meta["date"])
+    front["item"] = item_id
+    return front
 
 
-def plan_sections(item_dir, meta, lang, content_root, overrides):
-    """Generated section pages for one language, and which titles fell back."""
-    lang_dir = item_dir / "editing" / lang
-    _, bodies, directories = hierarchy.walk_editing_tree(lang_dir)
-    root = docs_root(content_root, lang, meta["slug"])
+def plan_docs(item_dir, item_id, meta, langs, content_root):
+    """Plan every leaf and generated section page across the given languages.
+
+    Planning reads and parses every source, so a malformed document fails
+    before the first file is written — the `docs` path is the one that asks
+    for hand-authored per-file front matter, so a YAML typo is routine.
+    """
+    overrides = hierarchy.load_structure(item_dir)
     structure_path = item_dir / "structure.md"
+    hierarchy.validate_sections(
+        overrides, section_union(item_dir, meta), structure_path
+    )
 
     writes = []
     fallbacks = []
-    for section in directories:
-        front, fell_back = hierarchy.resolve_section_meta(
-            section, overrides, lang, meta["title"][lang], structure_path
+    for lang in langs:
+        lang_dir = item_dir / "editing" / lang
+        leaves, bodies, directories = (
+            hierarchy.walk_editing_tree(lang_dir)
+            if lang_dir.is_dir()
+            else ([], {}, [""])
         )
-        if fell_back:
-            fallbacks.append(section)
-        body_rel = bodies.get(section)
-        writes.append(Write(
-            source=(lang_dir / body_rel) if body_rel else None,
-            target=(root / section / SECTION_FILE) if section else root / SECTION_FILE,
-            front=front,
-        ))
-    return writes, fallbacks
-
-
-def write_docs(meta, item_id, write):
-    """Write one planned file — leaf or generated section — into content/."""
-    body = ""
-    own = {}
-    if write.source is not None:
-        own, body = split_front_matter(
-            write.source.read_text(encoding="utf-8"), write.source
-        )
-    if write.front is None:
-        front, fell_back = merge_leaf_front_matter(
-            meta, item_id, own, body, write.source
-        )
-        if fell_back:
-            print(
-                f"warning: {write.source} has no title and no H1; using "
-                f"{front['title']!r} from the filename",
-                file=sys.stderr,
+        if not leaves:
+            raise PublishError(
+                f"no documents for language {lang!r}: expected at least one "
+                f"document (a `.md` file other than `{SECTION_FILE}`) under "
+                f"{lang_dir}"
             )
-    else:
-        front = dict(write.front)
-        for key, value in own.items():
-            if key not in ("item", "title"):
-                front.setdefault(key, value)
-        front["date"] = front.get("date", meta["date"])
-        front["item"] = item_id
+        root = docs_root(content_root, lang, meta["slug"])
 
-    write.target.parent.mkdir(parents=True, exist_ok=True)
-    write.target.write_text(dump_front_matter(front, body), encoding="utf-8")
-    return write.target
+        for rel in leaves:
+            source = lang_dir / rel
+            own, body = read_source(source)
+            front, fell_back = merge_leaf_front_matter(
+                meta, item_id, own, body, source
+            )
+            if fell_back:
+                print(
+                    f"warning: {source} has no title and no H1; using "
+                    f"{front['title']!r} from the filename",
+                    file=sys.stderr,
+                )
+            writes.append(
+                Write(source=source, target=root / rel, front=front, body=body)
+            )
+
+        for section in directories:
+            resolved, fell_back = hierarchy.resolve_section_meta(
+                section, overrides, lang, meta["title"][lang], structure_path
+            )
+            if fell_back:
+                fallbacks.append(section)
+            body_rel = bodies.get(section)
+            source = (lang_dir / body_rel) if body_rel else None
+            own, body = read_source(source)
+            writes.append(Write(
+                source=source,
+                target=(root / section / SECTION_FILE) if section else root / SECTION_FILE,
+                front=merge_section_front_matter(resolved, own, meta, item_id),
+                body=body,
+            ))
+
+    for section in sorted(set(fallbacks)):
+        print(
+            f"warning: section {section!r} has no title in structure.md; "
+            f"using the directory name. On a bilingual site this shows "
+            f"the same name in every language.",
+            file=sys.stderr,
+        )
+    return writes
+
+
+def write_all(planned):
+    """Write every planned file. Formatting only — nothing here can fail.
+
+    Every source has already been parsed and every target checked for
+    ownership, so this loop cannot stop halfway and leave a partial publish.
+    """
+    for write in planned:
+        write.target.parent.mkdir(parents=True, exist_ok=True)
+        write.target.write_text(
+            dump_front_matter(write.front, write.body), encoding="utf-8"
+        )
+    return [write.target for write in planned]
 
 
 def expected_targets(item_dir, meta, content_root):
@@ -430,29 +449,7 @@ def main(argv=None):
             langs = [args.lang]
         content_root = args.root / "content"
         if item_target(meta) == "docs":
-            overrides = hierarchy.load_structure(item_dir)
-            hierarchy.validate_sections(
-                overrides, section_union(item_dir, meta), item_dir / "structure.md"
-            )
-            planned = []
-            fallbacks = []
-            for lang in langs:
-                planned.extend(resolve_docs_language(
-                    item_dir, args.item_id, meta, lang, content_root, args.force,
-                ))
-                section_writes, fell_back = plan_sections(
-                    item_dir, meta, lang, content_root, overrides
-                )
-                planned.extend(section_writes)
-                fallbacks.extend(fell_back)
-            written = [write_docs(meta, args.item_id, w) for w in planned]
-            for section in sorted(set(fallbacks)):
-                print(
-                    f"warning: section {section!r} has no title in structure.md; "
-                    f"using the directory name. On a bilingual site this shows "
-                    f"the same name in every language.",
-                    file=sys.stderr,
-                )
+            planned = plan_docs(item_dir, args.item_id, meta, langs, content_root)
         else:
             if (item_dir / "structure.md").is_file():
                 print(
@@ -460,16 +457,12 @@ def main(argv=None):
                     "this item's target is posts, not docs",
                     file=sys.stderr,
                 )
-            posts_planned = [
-                (lang, *resolve_language(
-                    item_dir, args.item_id, meta, lang, content_root, args.force
-                ))
-                for lang in langs
-            ]
-            written = [
-                write_language(meta, lang, args.item_id, final, target)
-                for lang, final, target in posts_planned
-            ]
+            planned = plan_posts(item_dir, args.item_id, meta, langs, content_root)
+        # One gate over every planned target, leaf and section alike, after
+        # both planners and before any write.
+        for write in planned:
+            check_ownership(write.target, args.item_id, args.force)
+        written = write_all(planned)
     except (PublishError, FrontMatterError, HierarchyError) as exc:
         sys.exit(f"error: {exc}")
 

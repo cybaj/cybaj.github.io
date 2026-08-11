@@ -2,6 +2,7 @@
 """End-to-end tests for the writing pipeline scripts."""
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -309,6 +310,23 @@ class MalformedMetadataTest(PublishFixture):
         self.assertNotIn("Traceback", result.stderr)
         self.assertNotIn("yaml.scanner", result.stderr)
         self.assertFalse(self.published("korean").exists())
+
+    def test_a_malformed_final_writes_nothing(self):
+        """A YAML typo in one language must not half-publish the other.
+
+        The source files are parsed while planning, not while writing, so a
+        parse failure lands before the first byte reaches content/.
+        """
+        self.prepare(
+            langs="ko,en",
+            bodies={"ko": "# body ko\n", "en": '---\ntitle: "unclosed\n---\n\nbody\n'},
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("error:", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertFalse(self.published("korean").exists())
+        self.assertFalse(self.published("english").exists())
 
     def test_title_as_a_plain_string_fails_cleanly(self):
         self.prepare(langs="ko")
@@ -692,6 +710,36 @@ class DocsTargetTest(DocsFixture):
         self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertFalse(self.out("korean", "setup.md").exists())
 
+    def test_a_malformed_document_writes_nothing(self):
+        """One broken document must not leave its siblings half-published.
+
+        The docs path is the one that asks for hand-authored per-file front
+        matter, so a YAML typo is the everyday failure. `a-setup.md` sorts
+        first and would have been written before `b-broken.md` was ever read.
+        """
+        self.prepare(langs="ko")
+        self.write_doc("ko", "a-setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.write_doc("ko", "b-broken.md", '---\ntitle: "안 닫힘\n---\n\n본문\n')
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("b-broken.md", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        published = self.tmp / "content" / "korean" / "docs"
+        self.assertEqual(
+            sorted(p.name for p in published.rglob("*.md")),
+            [],
+            "a failed publish must write no files at all",
+        )
+
+    def test_only_index_files_names_what_is_missing(self):
+        """`_index.md` is a .md file; the message must not claim otherwise."""
+        self.prepare(langs="ko")
+        self.write_doc("ko", "_index.md", "이 가이드에 대하여\n")
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("_index.md", result.stderr)
+        self.assertIn("other than", result.stderr)
+
     def test_unknown_target_is_rejected(self):
         self.prepare(langs="ko", target="wiki")
         self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
@@ -814,6 +862,30 @@ class SectionPageTest(DocsFixture):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("title: 심화", self.out("korean", "advanced/_index.md").read_text(encoding="utf-8"))
 
+    def test_structure_md_outranks_an_author_written_index(self):
+        """structure.md decides the sidebar; the page's own title loses.
+
+        Locking the precedence down: an `_index.md` supplies landing copy, not
+        the section's name, or the same section could be titled two ways.
+        """
+        self.prepare(langs="ko")
+        self.write_doc("ko", "templates/basics.md", '---\ntitle: "기초"\n---\n\n본문\n')
+        self.write_doc(
+            "ko",
+            "templates/_index.md",
+            '---\ntitle: "AUTHOR TITLE"\nweight: 99\n---\n\n템플릿 소개\n',
+        )
+        self.write_structure(
+            '---\nsections:\n  templates:\n    title: {ko: "템플릿"}\n---\n'
+        )
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        text = self.out("korean", "templates/_index.md").read_text(encoding="utf-8")
+        self.assertIn("title: 템플릿", text)
+        self.assertNotIn("AUTHOR TITLE", text)
+        self.assertIn("템플릿 소개", text, "the body is still the author's")
+        self.assertIn("weight: 99", text, "other keys still fill gaps")
+
     def test_structure_on_a_posts_item_warns_and_is_ignored(self):
         self.prepare(langs="ko", target="posts")
         (self.item_dir(self.ITEM) / "editing" / "ko" / "final.md").write_text(
@@ -824,6 +896,59 @@ class SectionPageTest(DocsFixture):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("structure.md", result.stderr)
         self.assertIn("ignor", result.stderr.lower())
+
+
+class SectionOwnershipTest(DocsFixture):
+    """A generated section page is content too: it must not clobber silently.
+
+    The hole these cover only bit when no *leaf* happened to collide — with a
+    leaf collision the run refused before writing anything, which is why it
+    survived review. `setup.md` here is deliberately new, so only the section
+    page collides.
+    """
+
+    def seed_with_existing_index(self, front):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        existing = self.out("korean", "_index.md")
+        existing.parent.mkdir(parents=True, exist_ok=True)
+        existing.write_text(front, encoding="utf-8")
+        return existing
+
+    def test_handwritten_section_page_is_refused(self):
+        existing = self.seed_with_existing_index(
+            "---\ntitle: 손으로 쓴 섹션\n---\n\n안내문\n"
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not produced by this pipeline", result.stderr)
+        self.assertIn("no item marker", result.stderr)
+        self.assertIn("손으로 쓴 섹션", existing.read_text(encoding="utf-8"))
+        self.assertFalse(
+            self.out("korean", "setup.md").exists(),
+            "the refusal must land before any file is written",
+        )
+
+    def test_force_overwrites_a_handwritten_section_page(self):
+        existing = self.seed_with_existing_index(
+            "---\ntitle: 손으로 쓴 섹션\n---\n\n안내문\n"
+        )
+        result = self.publish("--force")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        text = existing.read_text(encoding="utf-8")
+        self.assertIn("title: 휴고 가이드", text)
+        self.assertIn("item: 2026-08-10-hugo-guide", text)
+
+    def test_section_page_of_another_item_is_refused_by_name(self):
+        existing = self.seed_with_existing_index(
+            "---\ntitle: 다른 항목\nitem: 2026-01-01-other\n---\n\n본문\n"
+        )
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("belongs to a different item", result.stderr)
+        self.assertIn("2026-01-01-other", result.stderr)
+        self.assertNotIn("hand-written", result.stderr)
+        self.assertIn("다른 항목", existing.read_text(encoding="utf-8"))
 
 
 class TreeOrphanTest(DocsFixture):
@@ -888,6 +1013,96 @@ class TreeOrphanTest(DocsFixture):
         result = self.publish("--lang", "ko")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr, "")
+
+
+class HugoBuildTest(DocsFixture):
+    """Does hugo-book actually accept what we generate?
+
+    Every other test asserts on generated text. This one builds the site and
+    reads the rendered sidebar, because what hugo-book renders is the point of
+    the `docs` target.
+
+    The temp root already mirrors the repo's layout — `content/{korean,english}`
+    is exactly what hugo.toml's per-language `contentDir` names — so the real
+    hugo.toml is copied in beside it and Hugo is pointed at the temp root with
+    `--themesDir` naming the repo's themes/. That builds the published tree
+    against the real theme and the real config without copying the theme and
+    without writing anything into the repo. `enableGitInfo` is turned off for
+    the build: the real config sets it, and a temp directory is no git repo.
+    """
+
+    def build(self):
+        hugo = shutil.which("hugo")
+        if hugo is None:  # pragma: no cover - depends on the machine
+            self.skipTest("hugo is not installed")
+        shutil.copy(REPO / "hugo.toml", self.tmp / "hugo.toml")
+        out = self.tmp / "public-test"
+        result = subprocess.run(
+            [hugo, "--source", str(self.tmp), "--themesDir", str(REPO / "themes"),
+             "--destination", str(out)],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "HUGO_ENABLEGITINFO": "false"},
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("ERROR", result.stdout + result.stderr)
+        return out
+
+    def sidebar(self, page):
+        """The rendered book-menu of one built page."""
+        html = page.read_text(encoding="utf-8")
+        match = re.search(r'<aside class="book-menu">(.*?)</aside>', html, re.S)
+        self.assertIsNotNone(match, "hugo-book rendered no sidebar")
+        return match.group(1)
+
+    def test_the_theme_renders_the_published_tree_in_its_sidebar(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.write_doc(
+            "ko", "templates/basics.md", '---\ntitle: "기초"\n---\n\n기초 본문\n'
+        )
+        self.write_doc("ko", "templates/_index.md", "템플릿 소개\n")
+        (self.item_dir(self.ITEM) / "structure.md").write_text(
+            '---\nsections:\n  templates:\n    title: {ko: "템플릿"}\n---\n',
+            encoding="utf-8",
+        )
+        self.assertEqual(self.publish().returncode, 0)
+
+        out = self.build()
+        page = out / "ko" / "docs" / "hugo-guide" / "setup" / "index.html"
+        self.assertTrue(page.is_file(), sorted(p.name for p in out.rglob("*.html")))
+        menu = self.sidebar(page)
+        self.assertIn("휴고 가이드", menu, "the root section is missing")
+        self.assertIn("템플릿", menu, "the structure.md title is missing")
+        self.assertIn('href="/ko/docs/hugo-guide/setup/"', menu)
+        self.assertIn('href="/ko/docs/hugo-guide/templates/basics/"', menu)
+        self.assertIn("기초", menu)
+
+    def test_a_section_page_without_a_body_is_not_a_link(self):
+        """The behaviour the README warns about, confirmed against the theme.
+
+        hugo-book renders a section with no content as plain text: correctly
+        nested and titled, but unclickable. The escape hatch is an
+        `editing/{lang}/<path>/_index.md` giving it a body — `with-copy/` has
+        one here and `bare/` does not.
+        """
+        self.prepare(langs="ko")
+        self.write_doc("ko", "bare/one.md", '---\ntitle: "하나"\n---\n\n본문\n')
+        self.write_doc("ko", "with-copy/two.md", '---\ntitle: "둘"\n---\n\n본문\n')
+        self.write_doc("ko", "with-copy/_index.md", "이 절에 대하여\n")
+        (self.item_dir(self.ITEM) / "structure.md").write_text(
+            "---\nsections:\n"
+            '  bare:\n    title: {ko: "맨섹션"}\n'
+            '  with-copy:\n    title: {ko: "안내섹션"}\n---\n',
+            encoding="utf-8",
+        )
+        self.assertEqual(self.publish().returncode, 0)
+
+        menu = self.sidebar(
+            self.build() / "ko" / "docs" / "hugo-guide" / "bare" / "one" / "index.html"
+        )
+        self.assertIn("<span>맨섹션</span>", " ".join(menu.split()))
+        self.assertIn('href="/ko/docs/hugo-guide/with-copy/"', menu)
 
 
 class TargetScaffoldTest(PipelineTest):
