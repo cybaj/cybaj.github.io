@@ -14,15 +14,31 @@ writing/items/{YYYY-MM-DD}-{tag}/
   state.md         where the item is now (front matter is authoritative)
   publish.md       metadata Hugo needs (front matter is authoritative)
   manner.md        voice and audience, then formatting and citation rules
+  structure.md     section overrides, docs items only
   sources/         which sources to draw on, and the queries used
   references/      material actually harvested, one file per reference
   docs/{lang}/     successive drafts, never overwritten
-  editing/{lang}/  editing passes, ending in final.md
+  editing/{lang}/  editing passes; for a docs item, the shape of the subtree
 ```
 
 The item id is `{YYYY-MM-DD}-{tag}`. The tag must match
 `^[a-z0-9]+(-[a-z0-9]+)*$`, because it is also the default publish slug. A
 same-day collision on the same tag takes a `-2` suffix.
+
+For a `docs` item, `docs/{lang}/` mirrors the same tree as `editing/{lang}/`,
+so a page's draft history sits where you would look for it:
+
+```
+docs/ko/setup-v1-20260811.md
+docs/ko/templates/basics-v1-20260811.md
+docs/ko/templates/basics-v2-20260812.md
+```
+
+This is a convention for your own benefit — nothing enforces or reads it.
+
+> **Two different `docs/`.** An item's `docs/` holds versioned drafts. Hugo's
+> `content/{lang}/docs/` holds the published tree that becomes the sidebar.
+> They share a name and nothing else.
 
 ## Stages
 
@@ -59,6 +75,7 @@ Whoever advances the item updates `state.md`, human or agent.
 ```bash
 make new TAG=hugo-pipeline               # Korean only
 make new TAG=hugo-pipeline LANGS=ko,en   # both languages
+make new TAG=hugo-pipeline TARGET=docs   # document tree
 ```
 
 **2. Plan.** Fill in `planning.md` and `manner.md`. `manner.md` matters more
@@ -82,9 +99,10 @@ the source contract.
 a new file. Never overwrite a draft; the history of how a piece got there is
 worth keeping.
 
-**6. Edit.** Work in `editing/{lang}/`, ending at `editing/{lang}/final.md`.
-`final.md` holds **body text only** — no front matter. `publish.md` is where
-metadata lives, and `publish.py` generates the front matter from it.
+**6. Edit.** Work in `editing/{lang}/`. A `posts` item ends at a single
+`editing/{lang}/final.md`, whose body publishes under front matter generated
+from `publish.md`. A `docs` item ends with the subtree you want published,
+each file carrying its own front matter.
 
 **7. Set the metadata.** Fill in `publish.md`. The scaffold leaves `title`
 blank for every declared language, and `publish.py` refuses to publish an item
@@ -128,10 +146,10 @@ slug over, and it destroys what was there:
 make publish ITEM=2026-08-10-hugo-pipeline FORCE=1
 ```
 
-Renaming a `slug`, or dropping a language from `languages`, leaves the file
-already published under the old name sitting in `content/`, still deploying.
-Publishing warns about every such orphan by name; the publish itself still
-succeeds, and deleting the old file is your call.
+Renaming a `slug`, dropping a language, deleting a page from a `docs` item's
+tree, or switching `target` all leave already-published files sitting in
+`content/`, still deploying. Publishing warns about every such orphan by name;
+the publish itself still succeeds, and deleting the old files is your call.
 
 ## Publish metadata
 
@@ -156,6 +174,77 @@ for every declared language. Optional: `tags`, `categories`, `author`, `draft`.
 Generated files carry `item: {item-id}` in their front matter. That marker is
 how `publish.py` recognizes files it owns; it refuses to overwrite hand-written
 content in `content/` unless given `--force` (`FORCE=1` through `make`).
+
+## Flat post or document tree
+
+`publish.md` chooses where an item lands:
+
+```yaml
+target: docs        # docs | posts   (default: posts)
+```
+
+| `target` | destination | shape |
+|---|---|---|
+| `posts` | `content/{lang}/posts/{slug}.md` | one flat, dated post |
+| `docs` | `content/{lang}/docs/{slug}/**` | a subtree in the sidebar |
+
+Omitting `target` means `posts`, so nothing written before this existed
+behaves differently.
+
+For a `docs` item, **the directories under `editing/{lang}/` are the tree**.
+Add a file, get a page; add a directory, get a section. Nothing lists them
+anywhere — the files are the source of truth.
+
+```
+editing/ko/                    →  content/korean/docs/hugo-guide/
+  setup.md                          _index.md         ← generated
+  templates/                        setup.md
+    basics.md                       templates/
+                                      _index.md       ← generated
+                                      basics.md
+```
+
+Each document carries its own front matter — `title`, `weight`, and any
+hugo-book flag. `publish.md` fills the gaps with item-wide `date`, `tags`,
+`categories`, `author` and `draft`. The document wins where both set a field;
+the `item:` marker is always the pipeline's.
+
+A document with no `title` takes the first `# H1` in its body, and failing
+that its filename, with a warning.
+
+## Section pages
+
+Section `_index.md` files are generated during publishing. You do not write
+them, and they do not exist in `editing/`.
+
+Their titles come from `structure.md`, which lists only the sections you want
+to customise — not an inventory of the tree:
+
+```yaml
+---
+sections:
+  templates:
+    title: {ko: "템플릿", en: "Templates"}
+    weight: 20
+    bookCollapseSection: true
+---
+```
+
+Recognised fields are `title` and `weight`; anything else passes straight into
+the generated front matter, so every hugo-book flag works — `bookCollapseSection`,
+`bookHidden`, `bookFlatSection`, `bookToc`.
+
+Titles resolve in order: the entry in `structure.md`, then the item title from
+`publish.md` for the root section, then the directory's own name — and that
+last case warns, because on a bilingual site an undeclared Korean section
+would otherwise appear under an English directory name without saying so.
+
+`structure.md` may be empty or absent. A section named there with no matching
+directory is an error.
+
+If you want landing copy on a section page, create
+`editing/{lang}/<path>/_index.md`. Its body is used; its front matter merges
+beneath the resolved section metadata.
 
 ## Languages
 
