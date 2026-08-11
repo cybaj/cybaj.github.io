@@ -110,6 +110,10 @@ def main(argv=None):
     parser.add_argument(
         "--target",
         default="posts",
+        # `choices` so --help renders {posts,docs} and a typo is rejected
+        # before anything is created. create_item keeps its own check: it is
+        # called directly, by the tests and by anything importing this module.
+        choices=KNOWN_TARGETS,
         help="posts for a flat blog post, docs for a document tree (default: posts)",
     )
     parser.add_argument(

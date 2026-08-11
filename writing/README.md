@@ -1,7 +1,8 @@
 # Writing protocol
 
-An **item** is a topic that motivates one or more posts. It is not a tag: a tag
-groups finished posts, an item is the reason several posts get written at all.
+An **item** is a topic that motivates one or more documents — a flat post, or a
+tree of pages. It is not a tag: a tag groups finished writing, an item is the
+reason that writing happens at all.
 
 Everything about one item lives in one directory. Human and agent follow the
 same protocol described here.
@@ -10,7 +11,7 @@ same protocol described here.
 
 ```
 writing/items/{YYYY-MM-DD}-{tag}/
-  planning.md      what posts this item yields, and why
+  planning.md      what documents this item yields, and why
   state.md         where the item is now (front matter is authoritative)
   publish.md       metadata Hugo needs (front matter is authoritative)
   manner.md        voice and audience, then formatting and citation rules
@@ -47,7 +48,7 @@ the order — the vocabulary exists so items can be reported on, not to gate you
 
 | Stage | Done when |
 |---|---|
-| `planning` | `planning.md` and `manner.md` are filled in; the posts are named |
+| `planning` | `planning.md` and `manner.md` are filled in; the documents are named |
 | `gathering` | `sources/` records which sources to use and the queries |
 | `drafting` | at least one draft per declared language in `docs/{lang}/` |
 | `editing` | a `posts` item has `editing/{lang}/final.md` for every declared language; a `docs` item has the subtree it wants published |
@@ -73,10 +74,16 @@ Whoever advances the item updates `state.md`, human or agent.
 **1. Create the item.**
 
 ```bash
-make new TAG=hugo-pipeline               # Korean only
-make new TAG=hugo-pipeline LANGS=ko,en   # both languages
-make new TAG=hugo-pipeline TARGET=docs   # document tree
+make new TAG=hugo-pipeline                    # Korean only
+make new TAG=hugo-pipeline LANGS=ko,en        # both languages
+make new TAG=hugo-pipeline TARGET=docs        # document tree
+make new TAG=hugo-pipeline DATE=2026-08-10    # backdate the item
 ```
+
+`TARGET` is `posts` or `docs`; see [Flat post or document tree](#flat-post-or-document-tree).
+`DATE` sets the item's date, which is both the `{YYYY-MM-DD}` in the item id
+and the `date` in `publish.md` — it defaults to today, and you want it when
+you are scaffolding an item for something already written.
 
 **2. Plan.** Fill in `planning.md` and `manner.md`. `manner.md` matters more
 than it looks: it is what an agent reads to sound like you rather than generic.
@@ -124,9 +131,12 @@ below for the full field list.
 make publish ITEM=2026-08-10-hugo-pipeline
 ```
 
-This writes `content/{korean,english}/posts/{slug}.md` for every declared
-language. Re-running overwrites, so fixing a typo is edit-and-republish. Then
-commit and push; CI builds and deploys to GitHub Pages.
+For a `posts` item — the default — this writes
+`content/{korean,english}/posts/{slug}.md` for every declared language; a
+`docs` item writes a subtree instead, see
+[Flat post or document tree](#flat-post-or-document-tree). Re-running
+overwrites, so fixing a typo is edit-and-republish. Then commit and push; CI
+builds and deploys to GitHub Pages.
 
 `LANGS` publishes one language instead of all of them — that is how you ship
 the Korean post while the English one is still being drafted:
@@ -139,8 +149,8 @@ make publish ITEM=2026-08-10-hugo-pipeline LANGS=ko
 and a single language for `publish`, which publishes one at a time.)
 
 `FORCE=1` overwrites content in `content/` that this pipeline does not own —
-a hand-written post, or one belonging to another item. It is how you take a
-slug over, and it destroys what was there:
+a hand-written post or section page, or one belonging to another item. It is
+how you take a slug over, and it destroys what was there:
 
 ```bash
 make publish ITEM=2026-08-10-hugo-pipeline FORCE=1
@@ -171,9 +181,11 @@ title:
 Required: `slug`, `languages`, `date`, `title`. `title` needs a non-empty entry
 for every declared language. Optional: `tags`, `categories`, `author`, `draft`.
 
-Generated files carry `item: {item-id}` in their front matter. That marker is
-how `publish.py` recognizes files it owns; it refuses to overwrite hand-written
-content in `content/` unless given `--force` (`FORCE=1` through `make`).
+Generated files carry `item: {item-id}` in their front matter — every file,
+including the section pages publishing generates for you. That marker is how
+`publish.py` recognizes files it owns; it refuses to overwrite hand-written
+content in `content/` unless given `--force` (`FORCE=1` through `make`), and
+it checks every file it is about to write before it writes any of them.
 
 ## Flat post or document tree
 
@@ -192,8 +204,10 @@ Omitting `target` means `posts`, so nothing written before this existed
 behaves differently.
 
 For a `docs` item, **the directories under `editing/{lang}/` are the tree**.
-Add a file, get a page; add a directory, get a section. Nothing lists them
-anywhere — the files are the source of truth.
+Add a file, get a page; add a directory *with a document in it*, get a section.
+Nothing lists them anywhere — the files are the source of truth. An empty
+directory is not a section, because the tree is derived from the `.md` files
+found in it; naming one in `structure.md` is then an error.
 
 ```
 editing/ko/                    →  content/korean/docs/hugo-guide/
@@ -235,6 +249,19 @@ Recognised fields are `title` and `weight`; anything else passes straight into
 the generated front matter, so every hugo-book flag works — `bookCollapseSection`,
 `bookHidden`, `bookFlatSection`, `bookToc`.
 
+Section paths are relative to `editing/{lang}/`, and the **root section is the
+empty key** — that is how you give the subtree's own landing page a weight or
+a theme flag:
+
+```yaml
+---
+sections:
+  "":
+    weight: 1
+    bookCollapseSection: true
+---
+```
+
 Titles resolve in order: the entry in `structure.md`, then the item title from
 `publish.md` for the root section, then the directory's own name — and that
 last case warns, because on a bilingual site an undeclared Korean section
@@ -243,15 +270,30 @@ would otherwise appear under an English directory name without saying so.
 `structure.md` may be empty or absent. A section named there with no matching
 directory is an error.
 
-If you want landing copy on a section page, create
-`editing/{lang}/<path>/_index.md`. Its body is used; its front matter merges
-beneath the resolved section metadata.
+> **A section page with no body is not a link.** hugo-book renders such a
+> section in the sidebar as plain text: correctly nested, correctly titled,
+> and unclickable. A generated `_index.md` has no body unless you write one,
+> so every section is like this by default — which is fine for a pure grouping
+> heading, and wrong the moment a reader expects a landing page there.
+
+Giving it a body is the fix: create `editing/{lang}/<path>/_index.md`. Its body
+is used, and its front matter fills gaps beneath the resolved section metadata —
+`structure.md` still decides the title, so a section is never named two ways.
 
 ## Languages
 
 An item declares its own languages. `[ko]` is a perfectly good item — the
 English side is simply never created. Adding `en` later means adding it to
 `languages`, adding a `title.en`, and creating `docs/en/` and `editing/en/`.
+
+## Preview
+
+```bash
+make serve
+```
+
+Runs `hugo server` with the hugo-book theme over the same `content/` CI
+deploys, on http://localhost:1313. It is what `make` with no target does.
 
 ## Tests
 

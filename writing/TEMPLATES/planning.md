@@ -4,9 +4,10 @@
 
 <!-- 이 item 이 무엇인지, 왜 지금 쓰는지. -->
 
-## Posts this item yields
+## Documents this item yields
 
-<!-- 하나의 item 은 여러 글이 될 수 있다. 각 글의 가제와 한 줄 요지. -->
+<!-- 하나의 item 은 여러 글이 될 수 있다. posts 라면 각 글, docs 라면 트리의
+     각 페이지. 가제와 한 줄 요지. -->
 
 1.
 
