@@ -16,6 +16,7 @@ PUBLISH = REPO / "scripts" / "publish.py"
 sys.path.insert(0, str(REPO / "scripts"))
 
 from frontmatter import FrontMatterError, split_front_matter  # noqa: E402
+import hierarchy  # noqa: E402
 
 
 def run(script, *args):
@@ -442,6 +443,99 @@ class MakefileTest(unittest.TestCase):
         env = {"LANG": "C.UTF-8"}
         self.assertNotIn("--lang", self.make_n("new", "TAG=x", env=env))
         self.assertNotIn("--lang", self.make_n("publish", "ITEM=x", env=env))
+
+
+class HierarchyTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp)
+
+    def tree(self, *rel_paths):
+        lang_dir = self.tmp / "editing" / "ko"
+        for rel in rel_paths:
+            path = lang_dir / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("body\n", encoding="utf-8")
+        return lang_dir
+
+    def write_structure(self, text):
+        (self.tmp / "structure.md").write_text(text, encoding="utf-8")
+
+    def test_walk_separates_leaves_sections_and_directories(self):
+        lang_dir = self.tree(
+            "setup.md", "_index.md", "templates/basics.md", "templates/_index.md"
+        )
+        leaves, bodies, directories = hierarchy.walk_editing_tree(lang_dir)
+        self.assertEqual(
+            sorted(p.as_posix() for p in leaves),
+            ["setup.md", "templates/basics.md"],
+        )
+        self.assertEqual(sorted(bodies), ["", "templates"])
+        self.assertEqual(directories, ["", "templates"])
+
+    def test_walk_records_intermediate_directories(self):
+        lang_dir = self.tree("a/b/c/deep.md")
+        _, _, directories = hierarchy.walk_editing_tree(lang_dir)
+        self.assertEqual(directories, ["", "a", "a/b", "a/b/c"])
+
+    def test_absent_structure_means_no_overrides(self):
+        self.assertEqual(hierarchy.load_structure(self.tmp), {})
+
+    def test_structure_loads_section_overrides(self):
+        self.write_structure(
+            '---\nsections:\n  templates:\n    title: {ko: "템플릿"}\n'
+            "    weight: 20\n---\n"
+        )
+        overrides = hierarchy.load_structure(self.tmp)
+        self.assertEqual(overrides["templates"]["weight"], 20)
+        self.assertEqual(overrides["templates"]["title"]["ko"], "템플릿")
+
+    def test_structure_rejects_a_non_map_sections(self):
+        self.write_structure("---\nsections: nope\n---\n")
+        with self.assertRaises(hierarchy.HierarchyError) as caught:
+            hierarchy.load_structure(self.tmp)
+        self.assertIn("map", str(caught.exception))
+
+    def test_declared_section_without_a_directory_is_an_error(self):
+        with self.assertRaises(hierarchy.HierarchyError) as caught:
+            hierarchy.validate_sections({"typo": {}}, ["", "templates"], "structure.md")
+        self.assertIn("typo", str(caught.exception))
+
+    def test_section_title_comes_from_the_override(self):
+        overrides = {"templates": {"title": {"ko": "템플릿", "en": "Templates"}}}
+        front, fell_back = hierarchy.resolve_section_meta(
+            "templates", overrides, "ko", "아이템 제목", "structure.md"
+        )
+        self.assertEqual(front["title"], "템플릿")
+        self.assertFalse(fell_back)
+
+    def test_root_section_falls_back_to_the_item_title(self):
+        front, fell_back = hierarchy.resolve_section_meta(
+            "", {}, "ko", "아이템 제목", "structure.md"
+        )
+        self.assertEqual(front["title"], "아이템 제목")
+        self.assertFalse(fell_back)
+
+    def test_undeclared_section_falls_back_to_its_directory_name(self):
+        front, fell_back = hierarchy.resolve_section_meta(
+            "a/advanced", {}, "ko", "아이템 제목", "structure.md"
+        )
+        self.assertEqual(front["title"], "advanced")
+        self.assertTrue(fell_back)
+
+    def test_unknown_keys_pass_through_to_front_matter(self):
+        overrides = {"t": {"title": {"ko": "T"}, "weight": 5, "bookCollapseSection": True}}
+        front, _ = hierarchy.resolve_section_meta(
+            "t", overrides, "ko", "제목", "structure.md"
+        )
+        self.assertEqual(front["weight"], 5)
+        self.assertTrue(front["bookCollapseSection"])
+
+    def test_a_bare_string_title_is_an_error(self):
+        overrides = {"t": {"title": "just a string"}}
+        with self.assertRaises(hierarchy.HierarchyError) as caught:
+            hierarchy.resolve_section_meta("t", overrides, "ko", "제목", "structure.md")
+        self.assertIn("language", str(caught.exception))
 
 
 if __name__ == "__main__":
