@@ -249,6 +249,30 @@ def resolve_docs_language(item_dir, item_id, meta, lang, content_root, force):
     return writes
 
 
+def plan_sections(item_dir, meta, lang, content_root, overrides):
+    """Generated section pages for one language, and which titles fell back."""
+    lang_dir = item_dir / "editing" / lang
+    _, bodies, directories = hierarchy.walk_editing_tree(lang_dir)
+    root = docs_root(content_root, lang, meta["slug"])
+    structure_path = item_dir / "structure.md"
+
+    writes = []
+    fallbacks = []
+    for section in directories:
+        front, fell_back = hierarchy.resolve_section_meta(
+            section, overrides, lang, meta["title"][lang], structure_path
+        )
+        if fell_back:
+            fallbacks.append(section)
+        body_rel = bodies.get(section)
+        writes.append(Write(
+            source=(lang_dir / body_rel) if body_rel else None,
+            target=(root / section / SECTION_FILE) if section else root / SECTION_FILE,
+            front=front,
+        ))
+    return writes, fallbacks
+
+
 def write_docs(meta, item_id, write):
     """Write one planned file — leaf or generated section — into content/."""
     body = ""
@@ -364,12 +388,31 @@ def main(argv=None):
                 overrides, section_union(item_dir, meta), item_dir / "structure.md"
             )
             planned = []
+            fallbacks = []
             for lang in langs:
                 planned.extend(resolve_docs_language(
                     item_dir, args.item_id, meta, lang, content_root, args.force,
                 ))
+                section_writes, fell_back = plan_sections(
+                    item_dir, meta, lang, content_root, overrides
+                )
+                planned.extend(section_writes)
+                fallbacks.extend(fell_back)
             written = [write_docs(meta, args.item_id, w) for w in planned]
+            for section in sorted(set(fallbacks)):
+                print(
+                    f"warning: section {section!r} has no title in structure.md; "
+                    f"using the directory name. On a bilingual site this shows "
+                    f"the same name in every language.",
+                    file=sys.stderr,
+                )
         else:
+            if (item_dir / "structure.md").is_file():
+                print(
+                    f"warning: {item_dir / 'structure.md'} is ignored because "
+                    "this item's target is posts, not docs",
+                    file=sys.stderr,
+                )
             posts_planned = [
                 (lang, *resolve_language(
                     item_dir, args.item_id, meta, lang, content_root, args.force

@@ -729,5 +729,86 @@ class DocsTargetTest(DocsFixture):
         )
 
 
+class SectionPageTest(DocsFixture):
+    def write_structure(self, text):
+        (self.item_dir(self.ITEM) / "structure.md").write_text(text, encoding="utf-8")
+
+    def test_root_section_uses_the_item_title(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.publish()
+        text = self.out("korean", "_index.md").read_text(encoding="utf-8")
+        self.assertIn("title: 휴고 가이드", text)
+        self.assertIn("item: 2026-08-10-hugo-guide", text)
+
+    def test_declared_section_uses_its_override(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "templates/basics.md", '---\ntitle: "기초"\n---\n\n본문\n')
+        self.write_structure(
+            '---\nsections:\n  templates:\n    title: {ko: "템플릿"}\n'
+            "    weight: 20\n    bookCollapseSection: true\n---\n"
+        )
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        text = self.out("korean", "templates/_index.md").read_text(encoding="utf-8")
+        self.assertIn("title: 템플릿", text)
+        self.assertIn("weight: 20", text)
+        self.assertIn("bookCollapseSection: true", text)
+
+    def test_undeclared_section_falls_back_and_warns(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "advanced/tips.md", '---\ntitle: "팁"\n---\n\n본문\n')
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("advanced", result.stderr)
+        text = self.out("korean", "advanced/_index.md").read_text(encoding="utf-8")
+        self.assertIn("title: advanced", text)
+
+    def test_an_editing_index_supplies_the_body(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.write_doc("ko", "_index.md", "이 가이드에 대하여\n")
+        self.publish()
+        text = self.out("korean", "_index.md").read_text(encoding="utf-8")
+        self.assertIn("이 가이드에 대하여", text)
+        self.assertIn("title: 휴고 가이드", text)
+
+    def test_declared_section_without_a_directory_is_an_error(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.write_structure('---\nsections:\n  typo:\n    weight: 1\n---\n')
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("typo", result.stderr)
+
+    def test_a_section_present_in_one_language_only_is_valid(self):
+        """A half-translated item must still publish.
+
+        Sections validate against the union across declared languages, not
+        per language — `advanced/` existing in Korean before English is the
+        normal state mid-translation, not an error.
+        """
+        self.prepare(langs="ko,en")
+        self.write_doc("ko", "advanced/tips.md", '---\ntitle: "팁"\n---\n\n본문\n')
+        self.write_doc("en", "setup.md", '---\ntitle: "Setup"\n---\n\nBody\n')
+        self.write_structure(
+            '---\nsections:\n  advanced:\n    title: {ko: "심화", en: "Advanced"}\n---\n'
+        )
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("title: 심화", self.out("korean", "advanced/_index.md").read_text(encoding="utf-8"))
+
+    def test_structure_on_a_posts_item_warns_and_is_ignored(self):
+        self.prepare(langs="ko", target="posts")
+        (self.item_dir(self.ITEM) / "editing" / "ko" / "final.md").write_text(
+            "본문\n", encoding="utf-8"
+        )
+        self.write_structure('---\nsections:\n  t:\n    weight: 1\n---\n')
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("structure.md", result.stderr)
+        self.assertIn("ignor", result.stderr.lower())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
