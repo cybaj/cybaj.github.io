@@ -50,7 +50,7 @@ the order — the vocabulary exists so items can be reported on, not to gate you
 | `planning` | `planning.md` and `manner.md` are filled in; the posts are named |
 | `gathering` | `sources/` records which sources to use and the queries |
 | `drafting` | at least one draft per declared language in `docs/{lang}/` |
-| `editing` | `editing/{lang}/final.md` exists for every declared language |
+| `editing` | a `posts` item has `editing/{lang}/final.md` for every declared language; a `docs` item has the subtree it wants published |
 | `published` | `publish.py` has written into `content/` and it is committed |
 
 Per-language progress is tracked separately, since languages advance at
@@ -214,8 +214,9 @@ that its filename, with a warning.
 
 ## Section pages
 
-Section `_index.md` files are generated during publishing. You do not write
-them, and they do not exist in `editing/`.
+Section `_index.md` files are generated during publishing — you never have to
+write one, and a directory without one still becomes a section. You *may* add
+one to give a section landing copy; see the end of this section.
 
 Their titles come from `structure.md`, which lists only the sections you want
 to customise — not an inventory of the tree:
