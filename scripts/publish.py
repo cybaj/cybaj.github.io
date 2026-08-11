@@ -304,45 +304,92 @@ def write_docs(meta, item_id, write):
     return write.target
 
 
-def find_orphans(item_id, meta, content_root):
+def expected_targets(item_dir, meta, content_root):
+    """Every path this item would write, per language, regardless of --lang.
+
+    Computed from `editing/`, not from what a run wrote, so publishing one
+    language never makes the other language's files look orphaned.
+
+    Generated section pages MUST be included. They derive from directories
+    rather than from editing files, so collecting only `editing/**/*.md` would
+    omit every `_index.md` and flag each one as an orphan on the next publish.
+    """
+    expected = {lang: set() for lang in LANG_DIRS}
+    if item_target(meta) != "docs":
+        for lang in meta["languages"]:
+            expected[lang].add(
+                content_root / LANG_DIRS[lang] / "posts" / f"{meta['slug']}.md"
+            )
+        return expected
+
+    for lang in meta["languages"]:
+        lang_dir = item_dir / "editing" / lang
+        if not lang_dir.is_dir():
+            continue
+        leaves, _, directories = hierarchy.walk_editing_tree(lang_dir)
+        root = docs_root(content_root, lang, meta["slug"])
+        for rel in leaves:
+            expected[lang].add(root / rel)
+        for section in directories:
+            expected[lang].add(
+                (root / section / SECTION_FILE) if section else root / SECTION_FILE
+            )
+    return expected
+
+
+def find_orphans(item_id, item_dir, meta, content_root):
     """Published files still marked as this item's that no longer belong.
 
-    Renaming an item's slug, or dropping a language from `languages`, leaves
-    the previously published file in `content/` where it keeps deploying.
+    Renaming an item's slug, dropping a language from `languages`, deleting a
+    page from a tree, or switching `target` all leave previously published
+    files in `content/` where they keep deploying.
 
-    Both language directories are scanned regardless of what the item declares
-    now, since a dropped language is exactly the case a declared-only scan
-    would miss. A file counts as current whenever its language is still
-    declared and its path is the one the current slug maps to — whether or not
-    this run rewrote it. Publishing one language of a two-language item is a
-    supported workflow, so "not written this run" must never mean "orphan".
+    Both `posts/` and `docs/` are scanned regardless of the item's current
+    target, since an item that switched target is exactly the case a
+    target-only scan would miss. A file counts as current whenever its
+    language is still declared and its path is one this item would write —
+    whether or not this run rewrote it. Publishing one language of a
+    multi-language item is a supported workflow, so "not written this run"
+    must never mean "orphan".
     """
     declared = set(meta["languages"])
+    expected = expected_targets(item_dir, meta, content_root)
     orphans = []
     for lang, dir_name in LANG_DIRS.items():
-        posts = content_root / dir_name / "posts"
-        if not posts.is_dir():
-            continue
-        expected = posts / f"{meta['slug']}.md"
-        for path in sorted(posts.glob("*.md")):
-            try:
-                existing, _ = split_front_matter(
-                    path.read_text(encoding="utf-8"), path
-                )
-            except (FrontMatterError, UnicodeDecodeError):
-                continue  # not ours to judge; publishing already succeeded
-            if existing.get("item") != item_id:
+        for area in ("posts", "docs"):
+            root = content_root / dir_name / area
+            if not root.is_dir():
                 continue
-            if lang not in declared:
-                orphans.append((path, f"language {lang!r} is no longer declared"))
-            elif path != expected:
-                orphans.append((path, f"the slug is now {meta['slug']!r}"))
+            for path in sorted(root.rglob("*.md")):
+                try:
+                    existing, _ = split_front_matter(
+                        path.read_text(encoding="utf-8"), path
+                    )
+                except (FrontMatterError, UnicodeDecodeError):
+                    continue  # not ours to judge; publishing already succeeded
+                if existing.get("item") != item_id:
+                    continue
+                if lang not in declared:
+                    orphans.append(
+                        (path, f"language {lang!r} is no longer declared")
+                    )
+                elif path not in expected[lang]:
+                    # Preserve the original, more specific posts-target
+                    # message (it names the new slug) for the case that
+                    # already shipped in Task 1-3's regression tests; trees,
+                    # and an item that switched target away from posts, get
+                    # the general reason since no single field explains them.
+                    if area == "posts" and item_target(meta) != "docs":
+                        reason = f"the slug is now {meta['slug']!r}"
+                    else:
+                        reason = "this item no longer publishes that path"
+                    orphans.append((path, reason))
     return orphans
 
 
-def warn_orphans(item_id, meta, content_root):
+def warn_orphans(item_id, item_dir, meta, content_root):
     """Report orphaned published files on stderr. Never fails the publish."""
-    for path, reason in find_orphans(item_id, meta, content_root):
+    for path, reason in find_orphans(item_id, item_dir, meta, content_root):
         print(
             f"warning: {path} still carries this item's marker but "
             f"{reason}; publish no longer writes it. Delete it by hand if it "
@@ -428,7 +475,7 @@ def main(argv=None):
 
     for target in written:
         print(f"published {target}")
-    warn_orphans(args.item_id, meta, content_root)
+    warn_orphans(args.item_id, item_dir, meta, content_root)
     print("next: set stage to published in state.md, then commit and push")
     return 0
 

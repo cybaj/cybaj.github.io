@@ -810,5 +810,69 @@ class SectionPageTest(DocsFixture):
         self.assertIn("ignor", result.stderr.lower())
 
 
+class TreeOrphanTest(DocsFixture):
+    def seed(self, langs="ko"):
+        self.prepare(langs=langs)
+        for lang in langs.split(","):
+            self.write_doc(lang, "setup.md", '---\ntitle: "T"\n---\n\n본문\n')
+            self.write_doc(lang, "templates/basics.md", '---\ntitle: "B"\n---\n\n본문\n')
+        self.assertEqual(self.publish().returncode, 0)
+
+    def test_deleted_page_becomes_an_orphan(self):
+        self.seed()
+        (self.item_dir(self.ITEM) / "editing" / "ko" / "templates" / "basics.md").unlink()
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("basics.md", result.stderr)
+
+    def test_renamed_slug_orphans_the_old_subtree(self):
+        self.seed()
+        self.write_publish_md(langs="ko", slug="renamed-guide")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("hugo-guide", result.stderr)
+        self.assertTrue(self.out("korean", "setup.md", slug="renamed-guide").is_file())
+
+    def test_dropped_language_orphans_its_subtree(self):
+        self.seed(langs="ko,en")
+        self.write_publish_md(langs="ko")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("english", result.stderr)
+
+    def test_target_switch_orphans_the_flat_post(self):
+        self.prepare(langs="ko", target="posts")
+        (self.item_dir(self.ITEM) / "editing" / "ko" / "final.md").write_text(
+            "본문\n", encoding="utf-8"
+        )
+        self.assertEqual(self.publish().returncode, 0)
+        self.write_publish_md(langs="ko", target="docs")
+        self.write_doc("ko", "setup.md", '---\ntitle: "T"\n---\n\n본문\n')
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("posts", result.stderr)
+
+    def test_generated_sections_are_never_orphans(self):
+        """The trap: _index.md comes from directories, not from editing files."""
+        self.seed()
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("_index.md", result.stderr)
+
+    def test_selective_publish_warns_about_nothing(self):
+        self.seed(langs="ko,en")
+        # An override for the generated `templates/` section keeps the
+        # unrelated "no title in structure.md" fallback warning (Task 3) out
+        # of this assertion; it is not present in either deleted-page test,
+        # where the section directory itself may no longer exist.
+        (self.item_dir(self.ITEM) / "structure.md").write_text(
+            '---\nsections:\n  templates:\n    title: {ko: "템플릿", en: "Templates"}\n---\n',
+            encoding="utf-8",
+        )
+        result = self.publish("--lang", "ko")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, "")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
