@@ -16,7 +16,7 @@ new:
 	python3 scripts/new_item.py "$(TAG)" \
 		$(if $(LANGS),--lang "$(LANGS)",) \
 		$(if $(DATE),--date "$(DATE)",) \
-		$(if $(TARGET),--target $(TARGET),)
+		$(if $(TARGET),--target "$(TARGET)",)
 
 # make publish ITEM=2026-08-10-hugo-pipeline [LANGS=ko] [FORCE=1]
 publish:

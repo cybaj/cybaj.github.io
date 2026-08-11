@@ -445,10 +445,20 @@ class MakefileTest(unittest.TestCase):
         self.assertNotIn("--lang", self.make_n("publish", "ITEM=x", env=env))
 
     def test_target_reaches_new_item(self):
-        self.assertIn("--target docs", self.make_n("new", "TAG=x", "TARGET=docs"))
+        self.assertIn('--target "docs"', self.make_n("new", "TAG=x", "TARGET=docs"))
 
     def test_bare_new_passes_no_target(self):
         self.assertNotIn("--target", self.make_n("new", "TAG=x"))
+
+    def test_target_is_quoted_against_shell_metacharacters(self):
+        """Unquoted $(TARGET) would let `TARGET='docs; cmd'` run cmd.
+
+        Make substitutes variables textually, so an unquoted expansion hands
+        /bin/sh the semicolon as a command separator. The quotes keep it
+        literal, and new_item.py then rejects the value by name.
+        """
+        rendered = self.make_n("new", "TAG=x", "TARGET=docs; touch pwned")
+        self.assertIn('--target "docs; touch pwned"', rendered)
 
 
 class HierarchyTest(unittest.TestCase):
