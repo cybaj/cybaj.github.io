@@ -554,5 +554,173 @@ class HierarchyTest(unittest.TestCase):
         self.assertIn("language", str(caught.exception))
 
 
+class DocsFixture(PipelineTest):
+    ITEM = "2026-08-10-hugo-guide"
+
+    def write_publish_md(self, langs="ko", target="docs", slug="hugo-guide"):
+        lang_list = langs.split(",")
+        titles = {"ko": "휴고 가이드", "en": "Hugo Guide"}
+        block = "\n".join(f'  {l}: "{titles[l]}"' for l in lang_list)
+        (self.item_dir(self.ITEM) / "publish.md").write_text(
+            "---\n"
+            f"target: {target}\n"
+            f"slug: {slug}\n"
+            f"languages: [{', '.join(lang_list)}]\n"
+            "date: 2026-08-10\n"
+            "tags: [hugo]\n"
+            "title:\n"
+            f"{block}\n"
+            "---\n",
+            encoding="utf-8",
+        )
+
+    def write_doc(self, lang, rel, text):
+        path = self.item_dir(self.ITEM) / "editing" / lang / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def prepare(self, langs="ko", target="docs", slug="hugo-guide"):
+        self.new("hugo-guide", langs=langs)
+        self.write_publish_md(langs=langs, target=target, slug=slug)
+
+    def publish(self, *extra):
+        return run(PUBLISH, self.ITEM, "--root", self.tmp, *extra)
+
+    def out(self, lang_dir, rel, slug="hugo-guide"):
+        return self.tmp / "content" / lang_dir / "docs" / slug / rel
+
+
+class DocsTargetTest(DocsFixture):
+    def test_publishes_a_nested_tree(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.write_doc(
+            "ko", "templates/basics.md", '---\ntitle: "기초"\nweight: 10\n---\n\n기초 본문\n'
+        )
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+        setup = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("title: 설치", setup)
+        self.assertIn("본문", setup)
+        basics = self.out("korean", "templates/basics.md").read_text(encoding="utf-8")
+        self.assertIn("weight: 10", basics)
+
+    def test_item_defaults_fill_gaps(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.publish()
+        text = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("date: 2026-08-10", text)
+        self.assertIn("hugo", text)
+        self.assertIn("item: 2026-08-10-hugo-guide", text)
+
+    def test_leaf_front_matter_wins_over_item_defaults(self):
+        self.prepare(langs="ko")
+        self.write_doc(
+            "ko", "setup.md", '---\ntitle: "설치"\ndate: 2020-01-01\n---\n\n본문\n'
+        )
+        self.publish()
+        text = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("date: 2020-01-01", text)
+
+    def test_a_leaf_cannot_override_the_item_marker(self):
+        self.prepare(langs="ko")
+        self.write_doc(
+            "ko", "setup.md", '---\ntitle: "설치"\nitem: forged\n---\n\n본문\n'
+        )
+        self.publish()
+        text = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("item: 2026-08-10-hugo-guide", text)
+        self.assertNotIn("forged", text)
+
+    def test_title_falls_back_to_the_h1(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", "# 설치 방법\n\n본문\n")
+        self.publish()
+        text = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("title: 설치 방법", text)
+
+    def test_title_falls_back_to_the_filename_with_a_warning(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", "본문만 있음\n")
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("setup", result.stderr)
+        text = self.out("korean", "setup.md").read_text(encoding="utf-8")
+        self.assertIn("title: setup", text)
+
+    def test_korean_is_not_escaped(self):
+        self.prepare(langs="ko")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.publish()
+        self.assertNotIn("\\u", self.out("korean", "setup.md").read_text(encoding="utf-8"))
+
+    def test_empty_language_tree_names_the_language(self):
+        self.prepare(langs="ko,en")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("'en'", result.stderr)
+
+    def test_partial_failure_writes_nothing(self):
+        self.prepare(langs="ko,en")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        self.publish()
+        self.assertFalse(self.out("korean", "setup.md").exists())
+
+    def test_unknown_target_is_rejected(self):
+        self.prepare(langs="ko", target="wiki")
+        self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("wiki", result.stderr)
+        self.assertIn("docs", result.stderr)
+
+    def test_publishes_both_languages(self):
+        self.prepare(langs="ko,en")
+        self.write_doc("ko", "templates/basics.md", '---\ntitle: "기초"\n---\n\n본문\n')
+        self.write_doc("en", "templates/basics.md", '---\ntitle: "Basics"\n---\n\nBody\n')
+        result = self.publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(
+            "title: 기초",
+            self.out("korean", "templates/basics.md").read_text(encoding="utf-8"),
+        )
+        self.assertIn(
+            "title: Basics",
+            self.out("english", "templates/basics.md").read_text(encoding="utf-8"),
+        )
+
+    def test_posts_target_is_unchanged_when_absent(self):
+        """The regression guard: no target means today's flat-post behaviour.
+
+        Asserts the exact bytes, not merely that a file appeared — this is the
+        only test standing between a refactor and silently changing the output
+        of every item published before targets existed.
+        """
+        self.new("hugo-pipeline", langs="ko")
+        item = self.item_dir("2026-08-10-hugo-pipeline")
+        (item / "publish.md").write_text(
+            '---\nslug: hugo-pipeline\nlanguages: [ko]\ndate: 2026-08-10\n'
+            'title:\n  ko: "제목"\n---\n',
+            encoding="utf-8",
+        )
+        (item / "editing" / "ko" / "final.md").write_text("본문\n", encoding="utf-8")
+        result = run(PUBLISH, "2026-08-10-hugo-pipeline", "--root", self.tmp)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        published = self.tmp / "content" / "korean" / "posts" / "hugo-pipeline.md"
+        self.assertEqual(
+            published.read_text(encoding="utf-8"),
+            "---\n"
+            "title: 제목\n"
+            "date: 2026-08-10\n"
+            "item: 2026-08-10-hugo-pipeline\n"
+            "---\n"
+            "\n"
+            "본문\n",
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -15,6 +15,8 @@ from frontmatter import (  # noqa: E402
     dump_front_matter,
     split_front_matter,
 )
+import hierarchy  # noqa: E402
+from hierarchy import HierarchyError, SECTION_FILE, Write  # noqa: E402
 
 # SLUG_RE and the language table are deliberately duplicated in new_item.py:
 # that script must run without PyYAML, so it cannot import from frontmatter.py
@@ -23,6 +25,7 @@ SLUG_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LANG_DIRS = {"ko": "korean", "en": "english"}
 REQUIRED = ("slug", "languages", "date", "title")
 OPTIONAL = ("tags", "categories", "author", "draft")
+TARGETS = ("posts", "docs")
 
 
 class PublishError(Exception):
@@ -70,7 +73,22 @@ def load_item(item_dir):
                 f"publish.md title has no non-empty entry for declared "
                 f"language {lang!r}"
             )
+    target = meta.get("target", "posts")
+    if target not in TARGETS:
+        raise PublishError(
+            f"unknown target {target!r}: expected one of {', '.join(TARGETS)}"
+        )
     return meta
+
+
+def item_target(meta):
+    """The publish destination kind for this item; `posts` when unset."""
+    return meta.get("target", "posts")
+
+
+def docs_root(content_root, lang, slug):
+    """The subtree root for one language, e.g. content/korean/docs/{slug}."""
+    return content_root / LANG_DIRS[lang] / "docs" / slug
 
 
 def build_front_matter(meta, lang, item_id):
@@ -81,6 +99,46 @@ def build_front_matter(meta, lang, item_id):
             front[field] = meta[field]
     front["item"] = item_id
     return front
+
+
+def leaf_title(own, body, source):
+    """A leaf's title: its own, else the first H1, else the filename stem.
+
+    Deriving from the H1 matches hugo-book itself — several pages in the
+    archived demo carry no front matter and take their title from the heading.
+    Returns (title, fell_back_to_filename).
+    """
+    if own.get("title"):
+        return own["title"], False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            return stripped[2:].strip(), False
+    return source.stem, True
+
+
+def merge_leaf_front_matter(meta, item_id, own, body, source):
+    """Front matter for one leaf: its own, over item defaults, plus the marker.
+
+    Returns (front, fell_back_to_filename). The leaf wins over item defaults —
+    publish.md supplies item-wide values, not every field — and the item marker
+    always wins over the leaf, because the orphan check depends on it.
+    """
+    title, fell_back = leaf_title(own, body, source)
+    # title and date lead so the generated front matter reads in a stable
+    # order; sort_keys=False preserves insertion order.
+    front = {"title": title, "date": meta["date"]}
+    for field in OPTIONAL:
+        if field in meta:
+            front[field] = meta[field]
+    for key, value in own.items():
+        if key != "item":
+            front[key] = value
+    # Re-assert both after the leaf's own keys: `title` because leaf_title has
+    # already resolved it, and `item` because a leaf must never forge it.
+    front["title"] = title
+    front["item"] = item_id
+    return front, fell_back
 
 
 def resolve_language(item_dir, item_id, meta, lang, content_root, force):
@@ -131,6 +189,95 @@ def write_language(meta, lang, item_id, final, target):
         encoding="utf-8",
     )
     return target
+
+
+def section_union(item_dir, meta):
+    """Every section path across all declared languages.
+
+    Sections are validated against the union, never per language: an item
+    mid-translation legitimately has `advanced/` in Korean before English, and
+    a per-language check would reject a section that is perfectly valid. All
+    declared languages are walked even when --lang narrows the publish, so the
+    union does not shrink with the selection.
+    """
+    union = set()
+    for lang in meta["languages"]:
+        lang_dir = item_dir / "editing" / lang
+        if lang_dir.is_dir():
+            _, _, directories = hierarchy.walk_editing_tree(lang_dir)
+            union.update(directories)
+    return sorted(union)
+
+
+def resolve_docs_language(item_dir, item_id, meta, lang, content_root, force):
+    """Validate one language's subtree, returning the writes it implies.
+
+    Section pages are added by `plan_sections`; this returns leaves only.
+    """
+    lang_dir = item_dir / "editing" / lang
+    leaves, _, _ = (
+        hierarchy.walk_editing_tree(lang_dir) if lang_dir.is_dir() else ([], {}, [""])
+    )
+    if not leaves:
+        raise PublishError(
+            f"no documents for language {lang!r}: expected at least one .md "
+            f"file under {lang_dir}"
+        )
+
+    root = docs_root(content_root, lang, meta["slug"])
+    writes = []
+    for rel in leaves:
+        target = root / rel
+        if target.exists() and not force:
+            existing, _ = split_front_matter(
+                target.read_text(encoding="utf-8"), target
+            )
+            owner = existing.get("item")
+            if owner is None:
+                raise PublishError(
+                    f"{target} was not produced by this pipeline "
+                    "(it carries no item marker, so it is hand-written content); "
+                    "refusing to overwrite. Pass --force to replace it."
+                )
+            if owner != item_id:
+                raise PublishError(
+                    f"{target} already belongs to a different item ({owner!r}); "
+                    "refusing to overwrite. Change this item's slug, or pass "
+                    "--force to take the slug over."
+                )
+        writes.append(Write(source=lang_dir / rel, target=target, front=None))
+    return writes
+
+
+def write_docs(meta, item_id, write):
+    """Write one planned file — leaf or generated section — into content/."""
+    body = ""
+    own = {}
+    if write.source is not None:
+        own, body = split_front_matter(
+            write.source.read_text(encoding="utf-8"), write.source
+        )
+    if write.front is None:
+        front, fell_back = merge_leaf_front_matter(
+            meta, item_id, own, body, write.source
+        )
+        if fell_back:
+            print(
+                f"warning: {write.source} has no title and no H1; using "
+                f"{front['title']!r} from the filename",
+                file=sys.stderr,
+            )
+    else:
+        front = dict(write.front)
+        for key, value in own.items():
+            if key not in ("item", "title"):
+                front.setdefault(key, value)
+        front["date"] = front.get("date", meta["date"])
+        front["item"] = item_id
+
+    write.target.parent.mkdir(parents=True, exist_ok=True)
+    write.target.write_text(dump_front_matter(front, body), encoding="utf-8")
+    return write.target
 
 
 def find_orphans(item_id, meta, content_root):
@@ -211,17 +358,29 @@ def main(argv=None):
                 )
             langs = [args.lang]
         content_root = args.root / "content"
-        planned = [
-            (lang, *resolve_language(
-                item_dir, args.item_id, meta, lang, content_root, args.force
-            ))
-            for lang in langs
-        ]
-        written = [
-            write_language(meta, lang, args.item_id, final, target)
-            for lang, final, target in planned
-        ]
-    except (PublishError, FrontMatterError) as exc:
+        if item_target(meta) == "docs":
+            overrides = hierarchy.load_structure(item_dir)
+            hierarchy.validate_sections(
+                overrides, section_union(item_dir, meta), item_dir / "structure.md"
+            )
+            planned = []
+            for lang in langs:
+                planned.extend(resolve_docs_language(
+                    item_dir, args.item_id, meta, lang, content_root, args.force,
+                ))
+            written = [write_docs(meta, args.item_id, w) for w in planned]
+        else:
+            posts_planned = [
+                (lang, *resolve_language(
+                    item_dir, args.item_id, meta, lang, content_root, args.force
+                ))
+                for lang in langs
+            ]
+            written = [
+                write_language(meta, lang, args.item_id, final, target)
+                for lang, final, target in posts_planned
+            ]
+    except (PublishError, FrontMatterError, HierarchyError) as exc:
         sys.exit(f"error: {exc}")
 
     for target in written:
