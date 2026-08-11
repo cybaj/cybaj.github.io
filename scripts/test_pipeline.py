@@ -664,9 +664,16 @@ class DocsTargetTest(DocsFixture):
         self.assertIn("'en'", result.stderr)
 
     def test_partial_failure_writes_nothing(self):
+        """A half-publishable tree must not half-publish.
+
+        The returncode assertion matters: without it this test cannot tell a
+        correct refusal from a publish.py that silently did nothing, which is
+        exactly how the flat-post version of this test was found lacking.
+        """
         self.prepare(langs="ko,en")
         self.write_doc("ko", "setup.md", '---\ntitle: "설치"\n---\n\n본문\n')
-        self.publish()
+        result = self.publish()
+        self.assertNotEqual(result.returncode, 0, result.stderr)
         self.assertFalse(self.out("korean", "setup.md").exists())
 
     def test_unknown_target_is_rejected(self):
