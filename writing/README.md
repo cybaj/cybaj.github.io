@@ -86,7 +86,21 @@ worth keeping.
 `final.md` holds **body text only** — no front matter. `publish.md` is where
 metadata lives, and `publish.py` generates the front matter from it.
 
-**7. Publish.**
+**7. Set the metadata.** Fill in `publish.md`. The scaffold leaves `title`
+blank for every declared language, and `publish.py` refuses to publish an item
+with a blank title — so this step is not optional:
+
+```yaml
+title:
+  ko: "Hugo 글쓰기 파이프라인"
+  en: "A Writing Pipeline for Hugo"
+```
+
+Check `slug` and `date` while you are there. The slug defaults to the tag you
+scaffolded with and becomes the post's URL. See [Publish metadata](#publish-metadata)
+below for the full field list.
+
+**8. Publish.**
 
 ```bash
 make publish ITEM=2026-08-10-hugo-pipeline
