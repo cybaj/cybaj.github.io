@@ -8,6 +8,8 @@ Your own document server, through the `docs` CLI.
   it, an idea you have been circling for months
 - Recovering what you already worked out. Search before writing — you have
   probably thought about this before and written it down
+- Walking a topic whole. Notes on one subject are usually a subtree, and
+  `children --all` returns it regardless of what the individual titles say
 - Following your own trail: `backlinks --direction outgoing` walks the links a
   note makes, which is often a better map of your thinking than search
 
@@ -15,6 +17,8 @@ Your own document server, through the `docs` CLI.
 
 - Anything you intend to quote. See `usage.md` — material from here informs a
   post, it does not appear in one.
+- Finding everything on a topic by search alone. Search matches words; a note
+  filed under a subject without naming it stays invisible to it. Walk the tree.
 - Anything you have not re-read recently. Notes rot faster than articles: they
   were written for the person you were at the time, with context you no longer
   have.

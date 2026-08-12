@@ -9,9 +9,19 @@ means the item builds on your thinking rather than restating someone else's.
 Search across spaces rather than guessing which one holds it — the same topic
 is often split across `dev`, `ml` and wherever you were working at the time.
 
-Then follow the trail: `backlinks --direction outgoing` on a promising note
-shows what you linked it to, which is usually a better map of your own thinking
-than another search.
+**Then stop searching and walk the tree.** Use the best hit to find the topic's
+root page and run `docs children <root> --all`. Search ranks by words, so it
+finds the notes that name your topic and misses the ones that do not — a page
+called `band cluster` filed under `Percolation theory` never appears in a search
+for "percolation", at any limit, because neither its title nor its body uses the
+word. The tree has no such blind spot.
+
+Doing this in the other order wastes effort: search until you have the root,
+then let the structure give you the rest.
+
+Finally follow the trail sideways: `backlinks --direction outgoing` on a
+promising note shows what you linked it to, which often maps your thinking
+better than either search or the tree.
 
 ## Per-post research
 
@@ -43,3 +53,10 @@ the whole cluster.
 - **Missing is ambiguous.** Exit code `5` covers forbidden and nonexistent
   alike, deliberately. A page vanishing from search does not tell you whether
   it was deleted or whether your token stopped being allowed to see it.
+
+- **Phases are yours, not the reference's.** `docs phase` reads a page's
+  lifecycle state, and `--phase` scopes `pages`, `children` and `search` to it.
+  Useful for deciding what to harvest — a note still at `scaffold` is probably
+  not ready to lean on. It is not recorded in the reference, because it changes
+  on your side without the text changing at all. Reading a phase is fine;
+  setting one is a write, and this source does not write.
