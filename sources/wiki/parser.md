@@ -8,7 +8,8 @@
    `https://{lang}.wikipedia.org/w/index.php?oldid={revid}`.
 4. Convert the extract to markdown, keeping section headings at the level
    Wikipedia uses.
-5. Prepend the front matter from `format.md`.
+5. Prepend the front matter from `format.md`. `type` is always `encyclopedia`
+   here — there is nothing to decide.
 6. If `langlinks` returned a counterpart and you want it, repeat from step 2
    for that language — as a **separate** reference file, not an addition to
    this one.

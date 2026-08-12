@@ -9,12 +9,18 @@ same protocol described here.
 
 ## Layout
 
+`writing/manner.md` holds the house style — voice, formatting, and the citation
+rules — and applies to every item. An item's own `manner.md` adds to it rather
+than replacing it.
+
 ```
+writing/manner.md  house style, shared by every item
+
 writing/items/{YYYY-MM-DD}-{tag}/
   planning.md      what documents this item yields, and why
   state.md         where the item is now (front matter is authoritative)
   publish.md       metadata Hugo needs (front matter is authoritative)
-  manner.md        voice and audience, then formatting and citation rules
+  manner.md        what differs from the house style, for this item only
   structure.md     section overrides, docs items only
   sources/         which sources to draw on, and the queries used
   references/      material actually harvested, one file per reference
@@ -85,8 +91,17 @@ make new TAG=hugo-pipeline DATE=2026-08-10    # backdate the item
 and the `date` in `publish.md` — it defaults to today, and you want it when
 you are scaffolding an item for something already written.
 
-**2. Plan.** Fill in `planning.md` and `manner.md`. `manner.md` matters more
-than it looks: it is what an agent reads to sound like you rather than generic.
+**2. Plan.** Fill in `planning.md`, then `manner.md`.
+
+The house style in [`writing/manner.md`](manner.md) already applies, so the
+item's own `manner.md` only records what is particular to this piece — its
+audience, any voice it needs that the house style does not give it, and
+anything it deliberately does differently. Departures go under
+`## 공통 manner 에서 벗어나는 점` with the reason; both files apply, and the
+item wins where they conflict.
+
+That file matters more than it looks: it is what an agent reads to sound like
+you rather than generic.
 
 **3. Gather.** Decide which sources to use and record them in `sources/`, with
 the actual queries. See `sources/README.md` for what is available and how each

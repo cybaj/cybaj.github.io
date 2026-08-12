@@ -23,6 +23,7 @@ One normalized reference file:
 ````markdown
 ---
 source: docs
+type: note
 url: docs://dev/Tl5fQtxcuy@2025-03-29T02:55:59.550Z
 retrieved: 2026-08-12
 title: "hugo"
@@ -44,6 +45,7 @@ https://gohugo.io/commands/
 | Field | Value |
 |---|---|
 | `source` | always `docs` |
+| `type` | always `note` — everything here is a personal note. A draft citing one renders the label (개인 노트 / personal note) so a reader can see the claim rests on private material they cannot check |
 | `url` | `docs://{space}/{slugId}@{updatedAt}` — see below |
 | `retrieved` | fetch date, `YYYY-MM-DD` |
 | `title` | the page title from `search --json` |

@@ -7,7 +7,8 @@
 2. `docs read <slugId>` for the body. It arrives as markdown with nothing
    wrapped around it.
 3. Assemble the locator: `docs://{space.slug}/{slugId}@{updatedAt}`.
-4. Prepend the front matter from `format.md`.
+4. Prepend the front matter from `format.md`. `type` is always `note` here —
+   there is nothing to decide.
 
 Two calls, not one — `read` carries no metadata and `search` carries no body.
 

@@ -8,7 +8,9 @@
 3. Convert to markdown, keeping heading levels as they are.
 4. Rewrite relative links and image sources to absolute, against the page URL.
    A relative link is useless once the page is a local file.
-5. Prepend the front matter from `format.md`.
+5. Decide the `type` — `documentation`, `article` or `paper` — using the rule
+   in `format.md`. This is the one source where it is a judgment.
+6. Prepend the front matter from `format.md`.
 
 ## Keep
 

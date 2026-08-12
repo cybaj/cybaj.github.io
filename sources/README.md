@@ -27,6 +27,7 @@ references/{YYYYMMDD}-{domain}-{slug}.md
 ```markdown
 ---
 source: web
+type: documentation
 url: https://gohugo.io/hugo-modules/
 retrieved: 2026-08-10
 title: "Hugo Modules"
@@ -36,6 +37,12 @@ title: "Hugo Modules"
 ```
 
 - `source` — the source directory name, so a reference can be traced back
+- `type` — what kind of document this is, as a stable key. Distinct from
+  `source`: `web` can return a specification, an article or a paper, while
+  `docs` only ever returns a note. Each source declares the types it emits in
+  its own `format.md`; drafts turn the key into words, so a Korean draft can
+  render `note` as 개인 노트 and an English one as personal note from the same
+  reference.
 - `url` — any locator: a URL, a file path, a video id
 - `retrieved` — when it was pulled, since sources change under you
 - `title` — human-readable, used when citing

@@ -26,6 +26,7 @@ One normalized reference file:
 ```markdown
 ---
 source: wiki
+type: encyclopedia
 url: https://ko.wikipedia.org/w/index.php?oldid=39845983
 retrieved: 2026-08-12
 title: "기계 학습"
@@ -47,6 +48,7 @@ title: "기계 학습"
 | Field | Value |
 |---|---|
 | `source` | always `wiki` |
+| `type` | always `encyclopedia` — an encyclopedia article is what this source returns, and the label warns a reader not to treat it as the authority |
 | `url` | **the permanent revision link**, `https://{lang}.wikipedia.org/w/index.php?oldid={revid}` — never the article URL |
 | `retrieved` | fetch date, `YYYY-MM-DD` |
 | `title` | the article title as Wikipedia spells it, including spacing |
