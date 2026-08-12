@@ -12,6 +12,7 @@ is the entire point: drafting never has to care where material came from.
 | Source | Use for |
 |---|---|
 | [`web/`](web/) | Any public URL — docs, articles, posts |
+| [`wiki/`](wiki/) | Wikipedia — orientation, terminology, and a route to primary sources |
 
 ## The normalized reference
 
