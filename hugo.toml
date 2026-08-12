@@ -34,3 +34,28 @@ weight = 10
 contentDir = 'content/korean'
 languageName = '한국어'
 weight = 20
+
+# Sidebar links below the document tree, alongside Blog (weight 5, set in
+# content/{lang}/posts/_index.md). One definition serves both languages, and
+# hugo-book adds target=_blank rel=noopener to any entry without a page.
+# Weights are spaced by ten so entries can be reordered without renumbering.
+
+[[menu.after]]
+  name = "emotional view"
+  url = "https://cybaj.github.io/blue-sober/"
+  weight = 10
+
+[[menu.after]]
+  name = "GitHub (cybaj)"
+  url = "https://github.com/cybaj"
+  weight = 20
+
+[[menu.after]]
+  name = "GitHub (tomatofromsky)"
+  url = "https://github.com/tomatofromsky"
+  weight = 30
+
+[[menu.after]]
+  name = "Instagram"
+  url = "https://www.instagram.com/skywisegram/"
+  weight = 40
