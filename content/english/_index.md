@@ -5,4 +5,4 @@ type: docs
 
 # cybaj
 
-Notes on software, written as they are worked out.
+Notes on mathematics, computer science, and other interesting topics, written from my data.

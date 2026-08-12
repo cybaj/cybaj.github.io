@@ -1,6 +1,6 @@
 baseURL = 'https://cybaj.github.io/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'HELLO'
 
 theme = "hugo-book"
 
