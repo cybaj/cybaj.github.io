@@ -2,6 +2,13 @@ baseURL = 'https://cybaj.github.io/'
 languageCode = 'en-us'
 title = 'HELLO'
 
+# Front matter dates are written as bare dates (date: 2026-08-13) by publish.py.
+# Without this, Hugo reads them as UTC midnight, so an item dated "today" in
+# KST is up to nine hours in the future — and Hugo silently drops future-dated
+# pages from the build. Setting the site's zone makes a bare date mean midnight
+# where the writing actually happens.
+timeZone = 'Asia/Seoul'
+
 theme = "hugo-book"
 
 # Book configuration
