@@ -10,3 +10,9 @@ __pycache__/
 # are deliberately still tracked: the protocol is the project, and the test
 # suite copies TEMPLATES into every fixture.
 /writing/items/
+
+# Design history — specs and implementation plans from the superpowers
+# workflow. Kept on disk because they record why the pipeline is shaped
+# the way it is, but they are working notes about building the repo
+# rather than part of it, so they stay off the remote.
+/docs/superpowers/

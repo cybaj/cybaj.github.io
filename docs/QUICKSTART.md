@@ -81,9 +81,9 @@ make serve    # http://localhost:1313
 | `sources/` | The source contract: how each source produces a normalized reference. |
 | `scripts/` | `new_item.py`, `publish.py`, `hierarchy.py`, `frontmatter.py`, `test_pipeline.py`. |
 | `themes/hugo-book/` | Theme, as a git submodule. |
-| `docs/superpowers/` | Design history — specs and implementation plans. |
+| `docs/superpowers/` | Design history — specs and implementation plans. Local only, gitignored. |
 | `archive/hugo/` | The original demo scaffold. Nothing builds from it. |
-| `TODO/` | Original design notes, superseded by `docs/superpowers/specs/`. |
+| `TODO/` | Original design notes, superseded by `docs/superpowers/specs/`. Local only, gitignored. |
 | `public/`, `resources/_gen/` | Generated. Gitignored. |
 
 ## Daily commands
