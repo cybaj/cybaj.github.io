@@ -295,6 +295,12 @@ make serve
 Runs `hugo server` with the hugo-book theme over the same `content/` CI
 deploys, on http://localhost:1313. It is what `make` with no target does.
 
+**Restart it after publishing into a section that did not exist before.** The
+server watches the directories it found at startup, so the first `docs` item —
+or any item that creates a new top-level section — appears on disk and in a
+fresh `hugo` build but keeps 404ing in the browser until you restart. Editing a
+page inside a section it already knows about reloads normally.
+
 ## Tests
 
 ```bash
