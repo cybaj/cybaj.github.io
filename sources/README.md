@@ -13,6 +13,7 @@ is the entire point: drafting never has to care where material came from.
 |---|---|
 | [`web/`](web/) | Any public URL — docs, articles, posts |
 | [`wiki/`](wiki/) | Wikipedia — orientation, terminology, and a route to primary sources |
+| [`docs/`](docs/) | Your own notes, via the `docs` CLI — informs a post rather than appearing in it |
 
 ## The normalized reference
 
