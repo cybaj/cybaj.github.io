@@ -2,3 +2,10 @@
 .hugo_build.lock
 /resources/_gen/
 __pycache__/
+
+# Items stay local. Drafts, gathered sources and harvested references are
+# working material, not published content — only what publish.py writes into
+# content/ belongs on the remote. writing/README.md and writing/TEMPLATES/
+# are deliberately still tracked: the protocol is the project, and the test
+# suite copies TEMPLATES into every fixture.
+/writing/items/
