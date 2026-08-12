@@ -4,11 +4,27 @@ title = 'HELLO'
 
 theme = "hugo-book"
 
-googleAnalytics = "G-9WVGW5YY5G"
-
 # Book configuration
 disablePathToLower = true
 enableGitInfo = true
+
+
+# Google Analytics. The theme calls Hugo's embedded google_analytics template,
+# which reads this. Must be a GA4 id — Hugo warns and renders nothing for a
+# Universal Analytics "ua-" id, which stopped collecting in July 2023.
+#
+# This table has to sit below the bare keys above: a TOML table captures every
+# bare key that follows it, so placing it higher would turn disablePathToLower
+# and enableGitInfo into services.googleAnalytics settings.
+[services]
+[services.googleAnalytics]
+id = 'G-77BD0H9V3G'
+
+# respectDoNotTrack defaults to true, so the tag is withheld from visitors
+# whose browser sends Do Not Track. Set it false only deliberately.
+[privacy]
+[privacy.googleAnalytics]
+respectDoNotTrack = true
 
 
 # Needed for mermaid/katex shortcodes
