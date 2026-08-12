@@ -155,7 +155,8 @@ Since {{< katex >}}\mathrm{d}V{{< /katex >}} is arbitrary,
 {{< /katex >}}
 
 This is conservation of mass in its most compact form — algebraic rather than
-differential, with no derivatives at all. [Balance laws]({{< ref "balance.md" >}}) shows it is
+differential, with no derivatives at all.
+(personal note: what I can do in solid mechanics' final exam) [Balance laws]({{< ref "balance.md" >}}) shows it is
 equivalent to the usual PDE.
 
 ## Why {{< katex >}}\mathbf{F}{{< /katex >}} is not a strain measure
@@ -327,7 +328,8 @@ an incompressible motion is one with
 ## Numbers
 
 Take a unit square of rubber, stretched to twice its width and compressed to
-half its height. The mapping is
+half its height.
+(personal note: basic concepts on solid mechanics' final exam) The mapping is
 {{< katex >}}x_1 = 2X_1{{< /katex >}},
 {{< katex >}}x_2 = 0.5 X_2{{< /katex >}}, so
 

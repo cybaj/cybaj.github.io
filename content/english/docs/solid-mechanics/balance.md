@@ -13,6 +13,7 @@ Four statements, none of them about any particular material: mass is conserved,
 linear momentum balances, angular momentum balances, energy is conserved. Steel,
 rubber and water obey all four identically. Everything separating them waits
 until [Constitutive equations]({{< ref "constitutive.md" >}}).
+(personal note: preparation 1 : 기본 보존 법칙)
 
 Each law starts as a statement about a finite lump of material and ends as a
 PDE holding at every point. The same two tools make that conversion every time,
@@ -129,7 +130,8 @@ volume halves, {{< katex >}}J = 0.5{{< /katex >}}. Then
 \rho = \frac{\rho_0}{J} = \frac{1000}{0.5} = 2000 \ \mathrm{kg/m^3}
 {{< /katex >}}
 
-Half the volume, twice the density, the same mass. The continuity equation says
+Half the volume, twice the density, the same mass.
+(personal note: preparation 1 : 기본 보존 법칙) The continuity equation says
 this in rate form; {{< katex >}}\rho_0 = \rho J{{< /katex >}} says it directly.
 
 ## 2. Cauchy stress
@@ -275,6 +277,7 @@ consequently **is not symmetric**. That is a genuine inconvenience, and
 
 ### A number
 
+(personal note: preparation 1 : 기본 보존 법칙)
 A steel plate, {{< katex >}}\rho_0 = 7800 \ \mathrm{kg/m^3}{{< /katex >}}, held
 static under gravity {{< katex >}}g = 9.81 \ \mathrm{m/s^2}{{< /katex >}} acting
 along {{< katex >}}-x_2{{< /katex >}}. With

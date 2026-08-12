@@ -21,6 +21,7 @@ precise sense in which all three describe the same physics is **work
 conjugacy**. Stress and strain rate are only meaningful in pairs, and every
 correct pair produces the same number: the energy per unit time going into the
 material.
+(personal note: preparation 2 : 일 켤레성(Work Conjugacy)과 일률 유도)
 
 ## Why more than one is needed
 
@@ -224,6 +225,7 @@ Verifying that three formulas agree is exactly the kind of claim worth checking
 on a concrete matrix.
 
 Take a material under **simple shear**, with
+(personal note: preparation 2 : 일 켤레성(Work Conjugacy)과 일률 유도)
 
 {{< katex display=true >}}
 \mathbf{F} = \begin{bmatrix} 1 & 0.5 \\ 0 & 1 \end{bmatrix},

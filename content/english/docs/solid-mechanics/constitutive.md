@@ -21,6 +21,7 @@ What fills it is a **constitutive equation**: a relation between stress and
 deformation that constitutes the material. This page derives two, from
 opposite thermodynamic starting points. Elasticity stores energy and gives it
 back; plasticity dissipates it and does not.
+(personal note: preparation 4 : 초탄성(Hyperelasticity)과 소성(Plasticity))
 
 ## What a constitutive equation may look like
 

@@ -50,6 +50,7 @@ assumes the plateau exists.
 ## Three questions
 
 Strip away notation and the subject answers three questions in order.
+(personal note: basic concepts on solid mechanics' final exam)
 
 1. **How did the body change shape?** Purely geometric. No forces appear.
 2. **What forces arose inside it?** Purely mechanical. The material is not yet
@@ -91,6 +92,7 @@ integrates against test functions to build a weak form, and exactly the
 residual a physics-informed neural network penalises in its loss. In both
 cases the physics enters as the PDE derived in
 [Balance laws]({{< ref "balance.md" >}}), unchanged.
+(personal note: basic concepts on solid mechanics' final exam)
 
 The derivation matters for those uses specifically. A weak form is obtained by
 integrating the strong form by parts, and you cannot integrate by parts an

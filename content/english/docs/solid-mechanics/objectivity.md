@@ -15,6 +15,7 @@ answer should be zero.
 
 Compute {{< katex >}}\dot{\boldsymbol{\sigma}}{{< /katex >}} and it is not
 zero. This page explains why, and what to compute instead.
+(personal note: preparation 3 : 객관성(Objectivity) 및 리 미분(Lie time derivative))
 
 ## What objectivity requires
 
@@ -297,6 +298,7 @@ not share, and a concrete reason the choice matters.
 
 The claim to test is the opening one: a stressed body rotating rigidly should
 have zero stress rate.
+(personal note: preparation 3 : 객관성(Objectivity) 및 리 미분(Lie time derivative))
 
 A 2D element spins at {{< katex >}}\omega = 2\ \mathrm{rad/s}{{< /katex >}} with
 no deformation whatever, carrying
