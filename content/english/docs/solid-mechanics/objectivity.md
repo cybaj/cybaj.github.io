@@ -76,7 +76,7 @@ hold for the second observer:
 So {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} itself is fine. The trouble
 is exclusively with its time derivative.
 
-## Why {{< katex >}}\dot{\boldsymbol{\sigma}}{{< /katex >}} fails
+## Why the material time derivative fails
 
 Differentiate the transformation rule, using the product rule on three factors:
 

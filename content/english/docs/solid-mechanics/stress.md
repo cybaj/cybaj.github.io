@@ -81,7 +81,7 @@ Two identities are used repeatedly:
 the definition of the double contraction in trace form, and the cyclic property
 of the trace.
 
-## From {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} to {{< katex >}}\mathbf{P}{{< /katex >}}
+## From Cauchy to the first Piola–Kirchhoff stress
 
 Start from {{< katex >}}J\boldsymbol{\sigma}:\mathbf{L}{{< /katex >}} and
 substitute
@@ -119,7 +119,7 @@ so
 the energy pairing came out to match. That agreement is not a coincidence but a
 useful check that both definitions describe the same mechanics.
 
-## From {{< katex >}}\mathbf{P}{{< /katex >}} to {{< katex >}}\mathbf{S}{{< /katex >}}
+## From the first to the second Piola–Kirchhoff stress
 
 {{< katex >}}\mathbf{P}{{< /katex >}} is two-point and asymmetric because it
 inherited one leg from {{< katex >}}\mathbf{F}{{< /katex >}}. Removing that leg
@@ -238,7 +238,7 @@ Take a material under **simple shear**, with
 Shear is progressing at {{< katex >}}0.2{{< /katex >}} per second, and
 {{< katex >}}\mathbf{S}{{< /katex >}} is symmetric, as it must be.
 
-### Route 1: {{< katex >}}\mathbf{S}:\dot{\mathbf{E}}{{< /katex >}}
+### Route 1: the material pair
 
 {{< katex display=true >}}
 \mathbf{F}^T\dot{\mathbf{F}}
@@ -256,7 +256,7 @@ Shear is progressing at {{< katex >}}0.2{{< /katex >}} per second, and
 \mathbf{S}:\dot{\mathbf{E}} = (10)(0) + (5)(0.1) + (5)(0.1) + (20)(0.1) = 0 + 0.5 + 0.5 + 2.0 = 3.0
 {{< /katex >}}
 
-### Route 2: {{< katex >}}\mathbf{P}:\dot{\mathbf{F}}{{< /katex >}}
+### Route 2: the two-point pair
 
 {{< katex display=true >}}
 \mathbf{P} = \mathbf{F}\mathbf{S}
@@ -270,7 +270,7 @@ Asymmetric, as promised — {{< katex >}}15 \neq 5{{< /katex >}}. Then
 \mathbf{P}:\dot{\mathbf{F}} = (12.5)(0) + (15)(0.2) + (5)(0) + (20)(0) = 3.0
 {{< /katex >}}
 
-### Route 3: {{< katex >}}J\boldsymbol{\sigma}:\mathbf{D}{{< /katex >}}
+### Route 3: the spatial pair
 
 {{< katex >}}J = \det\mathbf{F} = (1)(1) - (0.5)(0) = 1{{< /katex >}}, so simple
 shear preserves volume. Recover Cauchy stress from

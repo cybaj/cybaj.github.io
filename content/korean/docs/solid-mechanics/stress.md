@@ -77,7 +77,7 @@ item: 2026-08-13-solid-mechanics
 
 이중 축약을 대각합으로 쓴 것과 대각합의 순환 성질이다.
 
-## {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} 에서 {{< katex >}}\mathbf{P}{{< /katex >}} 로
+## 코시 응력에서 제1 PK 응력으로
 
 {{< katex >}}J\boldsymbol{\sigma}:\mathbf{L}{{< /katex >}} 에서 출발해
 [운동학]({{< ref "kinematics.md" >}})의
@@ -114,7 +114,7 @@ J\boldsymbol{\sigma}:\mathbf{L}
 힘의 논리만으로 정의되었다는 점이다. 그런데 에너지 짝이 정확히 맞아떨어졌다.
 우연이 아니라 두 정의가 같은 역학을 기술하고 있다는 확인이다.
 
-## {{< katex >}}\mathbf{P}{{< /katex >}} 에서 {{< katex >}}\mathbf{S}{{< /katex >}} 로
+## 제1 PK 응력에서 제2 PK 응력으로
 
 {{< katex >}}\mathbf{P}{{< /katex >}} 가 두 상태에 걸쳐 있고 대칭이 아닌 것은
 {{< katex >}}\mathbf{F}{{< /katex >}} 에게서 한쪽 다리를 물려받았기 때문이다.
@@ -234,7 +234,7 @@ stress)이 된다.
 초당 {{< katex >}}0.2{{< /katex >}} 의 속도로 전단이 진행 중이고,
 {{< katex >}}\mathbf{S}{{< /katex >}} 는 그래야 하는 대로 대칭이다.
 
-### 첫째 경로: {{< katex >}}\mathbf{S}:\dot{\mathbf{E}}{{< /katex >}}
+### 첫째 경로: 기준 상태 짝
 
 {{< katex display=true >}}
 \mathbf{F}^T\dot{\mathbf{F}}
@@ -252,7 +252,7 @@ stress)이 된다.
 \mathbf{S}:\dot{\mathbf{E}} = (10)(0) + (5)(0.1) + (5)(0.1) + (20)(0.1) = 0 + 0.5 + 0.5 + 2.0 = 3.0
 {{< /katex >}}
 
-### 둘째 경로: {{< katex >}}\mathbf{P}:\dot{\mathbf{F}}{{< /katex >}}
+### 둘째 경로: 두 상태에 걸친 짝
 
 {{< katex display=true >}}
 \mathbf{P} = \mathbf{F}\mathbf{S}
@@ -266,7 +266,7 @@ stress)이 된다.
 \mathbf{P}:\dot{\mathbf{F}} = (12.5)(0) + (15)(0.2) + (5)(0) + (20)(0) = 3.0
 {{< /katex >}}
 
-### 셋째 경로: {{< katex >}}J\boldsymbol{\sigma}:\mathbf{D}{{< /katex >}}
+### 셋째 경로: 현재 상태 짝
 
 {{< katex >}}J = \det\mathbf{F} = (1)(1) - (0.5)(0) = 1{{< /katex >}} 이므로
 단순 전단은 부피를 유지한다.

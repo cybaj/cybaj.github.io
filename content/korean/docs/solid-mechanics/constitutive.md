@@ -78,7 +78,7 @@ W = W(\mathbf{C}) = W(\mathbf{E})
 영구 기관을 만들 수 없고, 이를 바탕으로 한 수치 기법이 몰래 에너지를 만들어
 내는 일도 없다. 이 안정성이 이 형식을 널리 쓰는 실질적인 이유다.
 
-### {{< katex >}}W{{< /katex >}} 에서 {{< katex >}}\mathbf{P}{{< /katex >}} 구하기
+### 에너지 함수에서 제1 PK 응력 구하기
 
 [응력]({{< ref "stress.md" >}})에서 단위 기준 부피당 응력 일률이
 {{< katex >}}\mathbf{P}:\dot{\mathbf{F}}{{< /katex >}} 임을 확인했다. 탄성
@@ -104,7 +104,7 @@ W = W(\mathbf{C}) = W(\mathbf{E})
 \boxed{\;\mathbf{P} = \frac{\partial W}{\partial \mathbf{F}}\;}
 {{< /katex >}}
 
-### {{< katex >}}W{{< /katex >}} 에서 {{< katex >}}\mathbf{S}{{< /katex >}} 구하기
+### 에너지 함수에서 제2 PK 응력 구하기
 
 이번에는 짝 {{< katex >}}\mathbf{S}:\dot{\mathbf{E}}{{< /katex >}} 와, 객관성이
 요구하는 형태 {{< katex >}}W(\mathbf{E}){{< /katex >}} 로 같은 과정을 반복한다.

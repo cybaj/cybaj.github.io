@@ -104,7 +104,7 @@ the **continuity equation**. Expanding the material derivative gives the
 equivalent spatial form
 {{< katex >}}\partial \rho / \partial t + \nabla \cdot (\rho \mathbf{v}) = 0{{< /katex >}}.
 
-### Consistency with {{< katex >}}\rho_0 = \rho J{{< /katex >}}
+### Consistency with the algebraic form
 
 [Kinematics]({{< ref "kinematics.md" >}}) obtained conservation of mass as the algebraic
 statement {{< katex >}}\rho_0 = \rho J{{< /katex >}}, with no derivatives. The

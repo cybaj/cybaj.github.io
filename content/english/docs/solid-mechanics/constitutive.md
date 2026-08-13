@@ -79,7 +79,7 @@ hyperelastic material cannot be built into a perpetual motion machine, and a
 numerical scheme based on one cannot silently create energy. That stability is
 the practical reason the formulation dominates.
 
-### {{< katex >}}\mathbf{P}{{< /katex >}} from {{< katex >}}W{{< /katex >}}
+### First Piola–Kirchhoff stress from the energy
 
 [Stress]({{< ref "stress.md" >}}) established that the stress power per unit reference volume is
 {{< katex >}}\mathbf{P}:\dot{\mathbf{F}}{{< /katex >}}. For an elastic material
@@ -106,7 +106,7 @@ tensor contracting to zero against every tensor is zero. Hence
 \boxed{\;\mathbf{P} = \frac{\partial W}{\partial \mathbf{F}}\;}
 {{< /katex >}}
 
-### {{< katex >}}\mathbf{S}{{< /katex >}} from {{< katex >}}W{{< /katex >}}
+### Second Piola–Kirchhoff stress from the energy
 
 Repeat with the conjugate pair
 {{< katex >}}\mathbf{S}:\dot{\mathbf{E}}{{< /katex >}} and

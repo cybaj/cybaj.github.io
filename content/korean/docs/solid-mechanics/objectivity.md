@@ -78,7 +78,7 @@ frame-indifference)을 갖는다는 것은, 두 관찰자의 값이 딱 그 회�
 {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} 는 객관적이다. 문제는 오직
 그것을 시간으로 미분할 때 생긴다.
 
-## {{< katex >}}\dot{\boldsymbol{\sigma}}{{< /katex >}} 가 어긋나는 지점
+## 물질 시간 미분이 어긋나는 지점
 
 변환 관계를 세 인수의 곱으로 보고 미분한다.
 

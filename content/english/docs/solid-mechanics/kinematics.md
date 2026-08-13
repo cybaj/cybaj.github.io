@@ -107,7 +107,7 @@ configuration. It belongs to neither, which is why it behaves oddly later.
 {{< katex >}}\mathbf{F}{{< /katex >}} contains everything about local
 deformation. Every other measure on this page is built from it.
 
-## Volume, and why {{< katex >}}J > 0{{< /katex >}}
+## Volume, and why the Jacobian is positive
 
 Take three reference vectors
 {{< katex >}}\mathrm{d}\mathbf{X}^{(1)}, \mathrm{d}\mathbf{X}^{(2)}, \mathrm{d}\mathbf{X}^{(3)}{{< /katex >}}
@@ -159,7 +159,7 @@ differential, with no derivatives at all.
 (personal note: what I can do in solid mechanics' final exam) [Balance laws]({{< ref "balance.md" >}}) shows it is
 equivalent to the usual PDE.
 
-## Why {{< katex >}}\mathbf{F}{{< /katex >}} is not a strain measure
+## Why the deformation gradient is not a strain measure
 
 Rotate the body rigidly, without deforming it at all. Then
 {{< katex >}}\mathbf{x} = \mathbf{R}\mathbf{X}{{< /katex >}} for a constant
@@ -270,7 +270,7 @@ So undergraduate elasticity is the linearisation of this, and the dropped
 quadratic term is precisely what makes rotations look like strain when the
 linear theory is pushed too far.
 
-## Rates: {{< katex >}}\mathbf{L}{{< /katex >}}, {{< katex >}}\mathbf{D} {{< /katex >}}, {{< katex >}}\mathbf{W}{{< /katex >}}
+## Rates: velocity gradient, deformation rate, spin
 
 Later pages need not just deformation but its rate. Define the **velocity
 gradient** as a spatial derivative of the spatial velocity field:

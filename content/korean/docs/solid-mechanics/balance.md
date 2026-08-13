@@ -101,7 +101,7 @@ item: 2026-08-13-solid-mechanics
 {{< katex >}}\partial \rho / \partial t + \nabla \cdot (\rho \mathbf{v}) = 0{{< /katex >}}
 과 같다.
 
-### {{< katex >}}\rho_0 = \rho J{{< /katex >}} 와 어긋나지 않는가
+### 대수적 형태와 어긋나지 않는가
 
 [운동학]({{< ref "kinematics.md" >}})에서는 질량 보존을 미분이 없는 관계식
 {{< katex >}}\rho_0 = \rho J{{< /katex >}} 로 얻었다. 두 결과는 같아야 한다.

@@ -33,7 +33,7 @@ Independence is the point. The probability space is the product measure
 
 and every probability below refers to it.
 
-## Clusters and {{< katex >}}\theta(p){{< /katex >}}
+## Clusters and the percolation probability
 
 Suppose you may move only along what is open. The set of sites reachable from
 {{< katex >}}x{{< /katex >}} is its cluster {{< katex >}}C(x){{< /katex >}}.
@@ -45,7 +45,7 @@ infinite,
 \theta(p) = \mathbb{P}_p\big( |C(0)| = \infty \big)
 {{< /katex >}}
 
-## {{< katex >}}\theta{{< /katex >}} is increasing
+## The percolation probability is increasing
 
 "Larger {{< katex >}}p{{< /katex >}} means better connected" looks obvious, but
 changing {{< katex >}}p{{< /katex >}} changes the probability space, so the two

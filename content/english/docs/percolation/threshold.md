@@ -31,7 +31,7 @@ above. That dichotomy is what the phrase *phase transition* refers to.
 
 Note what has not been said: nothing about the value.
 
-## One dimension: {{< katex >}}p_c = 1{{< /katex >}}
+## One dimension: the threshold is 1
 
 Start with the easy case. For bond percolation on
 {{< katex >}}\mathbb{Z}{{< /katex >}}, the origin's cluster reaches at least
@@ -51,7 +51,7 @@ requires **every** bond on the way.
 This is exactly why dimension matters. From two dimensions on, there are
 detours.
 
-## Two dimensions: {{< katex >}}p_c \ge 1/3{{< /katex >}}
+## Two dimensions: the threshold is at least 1/3
 
 Detours exist, but small {{< katex >}}p{{< /katex >}} still fails to percolate.
 Counting paths shows it.
