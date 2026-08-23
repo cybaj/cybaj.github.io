@@ -250,6 +250,8 @@ Chain-of-thought, Prompt, context, harness engineering 까지 LLM 을 사용하�
 
 ![](/images/cv/research-abm-02.png)
 
+![](/images/cv/abm-shout.png)
+
 ### Ontology
 
 개발일을 할 때, 좀 더 semantic 하게 서비스를 구축하기 위해서 OWL 같은 표준을 공부하고 구축해보기도 하였습니다. 그러나 웹 세상은 훨씬 자유로웠고, 처리는 제한되었습니다. 근래에 LLM alignment 와 safety 에 대해서 ontology 가 중요해졌고 개인적으로도 가지고 있는 지식을 ontology 로 정리하는 것이 도움이 된다고 생각하여서 개인적인 용도의 ontology map 을 구축하고 있습니다.
