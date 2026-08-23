@@ -246,9 +246,9 @@ Chain-of-thought, Prompt, context, harness engineering 까지 LLM 을 사용하�
 
 수유너머에서 스터디 할 때 위층에 있는 수많은 책들 중에 눈에 띄었던 것은 행위자 이론 이었습니다. 학부 때 Agent-based modeling 이란 수업을 들었었고 집회에 대해 모델링 해보기도 했습니다. 사회학에서 논의되는 것보다는 공학적인 관점이었지만, 아이디어는 참 재밌다고 생각했습니다. 특히 LLM 의 기능을 Agent 로까지 확장시키고 있는 근래에 LLM 의 기능 생태계에 대한 해석 차원에 도움이 될 뿐 아니라, dynamics 를 수학적으로 표현할 수 있고, 이에 대해 여러 연구를 한 지금에서는 새로운 알고리즘이나, 방법론을 제안하는데 도움이 될 것이라 생각하여 여러가지 해보고 있습니다.
 
-![](/images/cv/research-abm-01.png)
+![](/images/cv/boids_flocking.gif)
 
-![](/images/cv/research-abm-02.png)
+![](/images/cv/predator_prey_ecology.gif)
 
 ![](/images/cv/abm-shout.png)
 
