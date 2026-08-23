@@ -13,7 +13,7 @@ infinite cluster change?
 
 ## Zero or one
 
-Consider the event that an infinite cluster exists **somewhere**. Changing
+Consider the event that an infinite cluster exists somewhere. Changing
 finitely many bonds cannot affect it — opening or closing a finite set neither
 creates nor destroys an infinite cluster. So it is a tail event, and by
 Kolmogorov's zero–one law its probability is 0 or 1
@@ -46,7 +46,7 @@ probability {{< katex >}}p^n{{< /katex >}}. Hence
 
 So no infinite cluster exists for any {{< katex >}}p < 1{{< /katex >}}: in one
 dimension the transition sits at the endpoint. It has to, since crossing
-requires **every** bond on the way.
+requires every bond on the way.
 
 This is exactly why dimension matters. From two dimensions on, there are
 detours.
@@ -103,7 +103,7 @@ before Harry Kesten proved it in the early 1980s. Self-duality had suggested
 the value long beforehand; the distance from a convincing guess to a proof was
 the hard part.
 
-Site percolation is different. **No analytic derivation is known.** The number
+Site percolation is different. No analytic derivation is known. The number
 above comes from simulating large lattices — the error bar is the evidence of
 that. Eight decimal places, and no account of why.
 
@@ -114,5 +114,5 @@ exactly; closed forms are close to exceptional. Yet the two arguments above
 establish that {{< katex >}}p_c{{< /katex >}} exists and that
 {{< katex >}}0 < p_c < 1{{< /katex >}}.
 
-Knowing something exists without knowing its value. A good deal of percolation
+Existence is known while the value is not, and a good deal of percolation
 theory lives in that gap.

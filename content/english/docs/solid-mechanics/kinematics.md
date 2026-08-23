@@ -9,15 +9,14 @@ weight: 10
 item: 2026-08-13-solid-mechanics
 ---
 
-Deformation before force. This page describes how a body changes shape and
-says nothing about why — every result here holds whether the body is steel,
+Deformation before force. How a body changes shape, with nothing said about why — every result here holds whether the body is steel,
 rubber or jelly.
 
 ## Two configurations, one convention
 
 Label each material particle by where it sat before anything happened. That
-position {{< katex >}}\mathbf{X}{{< /katex >}} in the **reference
-configuration** {{< katex >}}\Omega_0{{< /katex >}} is a permanent name for the
+position {{< katex >}}\mathbf{X}{{< /katex >}} in the reference
+configuration {{< katex >}}\Omega_0{{< /katex >}} is a permanent name for the
 particle, not a place it stays. At time {{< katex >}}t{{< /katex >}} the same
 particle is at
 
@@ -25,12 +24,12 @@ particle is at
 \mathbf{x} = \boldsymbol{\chi}(\mathbf{X}, t)
 {{< /katex >}}
 
-in the **current configuration** {{< katex >}}\Omega_t{{< /katex >}}.
+in the current configuration {{< katex >}}\Omega_t{{< /katex >}}.
 
 A convention runs through every page and is worth fixing now:
 
-> **Capitals refer to the reference configuration, lowercase to the current
-> one.** {{< katex >}}\mathbf{X}{{< /katex >}} against
+> Capitals refer to the reference configuration, lowercase to the current
+> one. {{< katex >}}\mathbf{X}{{< /katex >}} against
 > {{< katex >}}\mathbf{x}{{< /katex >}},
 > {{< katex >}}\mathrm{d}V{{< /katex >}} against
 > {{< katex >}}\mathrm{d}v{{< /katex >}},
@@ -39,10 +38,10 @@ A convention runs through every page and is worth fixing now:
 > {{< katex >}}\nabla{{< /katex >}} (with respect to
 > {{< katex >}}\mathbf{x}{{< /katex >}}).
 
-Two ways of describing a field follow. The **material** (Lagrangian)
+Two ways of describing a field follow. The material (Lagrangian)
 description gives a quantity as a function of
 {{< katex >}}(\mathbf{X}, t){{< /katex >}} — follow the particle. The
-**spatial** (Eulerian) description gives it as a function of
+spatial (Eulerian) description gives it as a function of
 {{< katex >}}(\mathbf{x}, t){{< /katex >}} — watch a fixed point in space and
 record whatever passes through.
 
@@ -69,7 +68,7 @@ motion and differentiating:
 
 by the chain rule, using
 {{< katex >}}\mathbf{v} = \partial \boldsymbol{\chi} / \partial t{{< /katex >}}.
-The overdot always means this — the **material time derivative**, holding
+The overdot always means this — the material time derivative, holding
 {{< katex >}}\mathbf{X}{{< /katex >}} fixed.
 
 The convective term {{< katex >}}\mathbf{v} \cdot \nabla f{{< /katex >}} is the
@@ -90,7 +89,7 @@ separation follows from a first-order Taylor expansion of the motion:
 = \frac{\partial \boldsymbol{\chi}}{\partial \mathbf{X}} \, \mathrm{d}\mathbf{X} + O(|\mathrm{d}\mathbf{X}|^2)
 {{< /katex >}}
 
-The matrix appearing there is the **deformation gradient**:
+The matrix appearing there is the deformation gradient:
 
 {{< katex display=true >}}
 \mathbf{F} = \frac{\partial \mathbf{x}}{\partial \mathbf{X}},
@@ -100,12 +99,12 @@ The matrix appearing there is the **deformation gradient**:
 
 The mixed index — lowercase {{< katex >}}i{{< /katex >}}, capital
 {{< katex >}}J{{< /katex >}} — is not decoration.
-{{< katex >}}\mathbf{F}{{< /katex >}} is a **two-point tensor**: it eats a
+{{< katex >}}\mathbf{F}{{< /katex >}} is a two-point tensor: it eats a
 vector in the reference configuration and returns one in the current
 configuration. It belongs to neither, which is why it behaves oddly later.
 
 {{< katex >}}\mathbf{F}{{< /katex >}} contains everything about local
-deformation. Every other measure on this page is built from it.
+deformation. Every other strain measure is built from it.
 
 ## Volume, and why the Jacobian is positive
 
@@ -123,7 +122,7 @@ gives
 \mathrm{d}v = J \, \mathrm{d}V, \qquad J = \det \mathbf{F}
 {{< /katex >}}
 
-{{< katex >}}J{{< /katex >}} is the **Jacobian**, the local volume ratio.
+{{< katex >}}J{{< /katex >}} is the Jacobian, the local volume ratio.
 {{< katex >}}J = 1{{< /katex >}} means volume-preserving.
 
 Two constraints on {{< katex >}}J{{< /katex >}} come from physics rather than
@@ -184,7 +183,7 @@ every {{< katex >}}\mathbf{F}{{< /katex >}} with
 
 with {{< katex >}}\mathbf{R}{{< /katex >}} a proper orthogonal rotation and
 {{< katex >}}\mathbf{U}, \mathbf{V}{{< /katex >}} symmetric positive definite —
-the **right** and **left stretch tensors**.
+the right and left stretch tensors.
 
 The existence argument is short.
 {{< katex >}}\mathbf{F}^T\mathbf{F}{{< /katex >}} is symmetric, and positive
@@ -211,7 +210,7 @@ rotation followed by a different pure stretch. Nothing else can happen locally.
 The decomposition suggests discarding {{< katex >}}\mathbf{R}{{< /katex >}} and
 keeping {{< katex >}}\mathbf{U}{{< /katex >}}. Extracting
 {{< katex >}}\mathbf{U}{{< /katex >}} requires a matrix square root, which is
-awkward, so its square is used instead — the **right Cauchy–Green tensor**:
+awkward, so its square is used instead — the right Cauchy–Green tensor:
 
 {{< katex display=true >}}
 \mathbf{C} = \mathbf{F}^T\mathbf{F} = \mathbf{U}\mathbf{R}^T\mathbf{R}\mathbf{U} = \mathbf{U}^2
@@ -232,7 +231,7 @@ Its meaning is a change in squared length. For a reference fibre
 
 {{< katex >}}\mathbf{C} = \mathbf{I}{{< /katex >}} means every fibre keeps its
 length, which is exactly "no deformation". Subtracting that baseline gives the
-**Green–Lagrange strain tensor**:
+Green–Lagrange strain tensor:
 
 {{< katex display=true >}}
 \mathbf{E} = \tfrac{1}{2}(\mathbf{C} - \mathbf{I}) = \tfrac{1}{2}(\mathbf{F}^T\mathbf{F} - \mathbf{I})
@@ -245,7 +244,7 @@ strain in the small-deformation limit, shown below.
 
 The mirror-image construction in the current configuration uses
 {{< katex >}}\mathbf{b} = \mathbf{F}\mathbf{F}^T = \mathbf{V}^2{{< /katex >}},
-the **left Cauchy–Green tensor**, which appears in
+the left Cauchy–Green tensor, which appears in
 [Constitutive equations]({{< ref "constitutive.md" >}}).
 
 ### The small-strain limit
@@ -272,8 +271,8 @@ linear theory is pushed too far.
 
 ## Rates: velocity gradient, deformation rate, spin
 
-Later pages need not just deformation but its rate. Define the **velocity
-gradient** as a spatial derivative of the spatial velocity field:
+Later pages need not just deformation but its rate. Define the velocity
+gradient as a spatial derivative of the spatial velocity field:
 
 {{< katex display=true >}}
 \mathbf{L} = \frac{\partial \mathbf{v}}{\partial \mathbf{x}}, \qquad L_{ij} = \frac{\partial v_i}{\partial x_j}
@@ -299,8 +298,8 @@ Split it into symmetric and skew parts:
 \mathbf{L} = \mathbf{D} + \mathbf{W}
 {{< /katex >}}
 
-{{< katex >}}\mathbf{D}{{< /katex >}} is the **rate of deformation**,
-{{< katex >}}\mathbf{W}{{< /katex >}} the **spin**. Under a rigid rotation
+{{< katex >}}\mathbf{D}{{< /katex >}} is the rate of deformation,
+{{< katex >}}\mathbf{W}{{< /katex >}} the spin. Under a rigid rotation
 {{< katex >}}\mathbf{D}{{< /katex >}} vanishes and
 {{< katex >}}\mathbf{W}{{< /katex >}} does not — which is why
 {{< katex >}}\mathbf{D}{{< /katex >}} carries the deforming and

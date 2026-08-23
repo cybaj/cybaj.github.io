@@ -16,14 +16,14 @@ differently.
 Take the lattice {{< katex >}}\mathbb{Z}^d{{< /katex >}}. Points with integer
 coordinates are sites; segments joining points at distance 1 are bonds.
 
-In **bond percolation** each bond {{< katex >}}e{{< /katex >}} is assigned
+In bond percolation each bond {{< katex >}}e{{< /katex >}} is assigned
 
 {{< katex display=true >}}
 \omega(e) = \begin{cases} 1 & \text{with probability } p \\ 0 & \text{with probability } 1-p \end{cases}
 {{< /katex >}}
 
 independently of every other bond; {{< katex >}}\omega(e)=1{{< /katex >}} means
-open. **Site percolation** does the same to the sites instead.
+open. Site percolation does the same to the sites instead.
 
 Independence is the point. The probability space is the product measure
 
@@ -61,7 +61,7 @@ Attach to each bond an independent
 For each {{< katex >}}p{{< /katex >}} the law of
 {{< katex >}}\omega_p{{< /katex >}} is exactly
 {{< katex >}}\mathbb{P}_p{{< /katex >}}. But now every
-{{< katex >}}p{{< /katex >}} uses the **same**
+{{< katex >}}p{{< /katex >}} uses the same
 {{< katex >}}U{{< /katex >}}, so for {{< katex >}}p < p'{{< /katex >}} the open
 bonds are nested:
 

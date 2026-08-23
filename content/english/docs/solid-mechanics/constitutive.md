@@ -17,9 +17,8 @@ mass and momentum. The deficit is not an oversight in the derivation. It is the
 place where steel stops behaving like rubber, and no argument from conservation
 principles can fill it.
 
-What fills it is a **constitutive equation**: a relation between stress and
-deformation that constitutes the material. This page derives two, from
-opposite thermodynamic starting points. Elasticity stores energy and gives it
+What fills it is a constitutive equation: a relation between stress and
+deformation that constitutes the material. Two are derived below, from opposite thermodynamic starting points. Elasticity stores energy and gives it
 back; plasticity dissipates it and does not.
 (personal note: preparation 4 : 초탄성(Hyperelasticity)과 소성(Plasticity))
 
@@ -48,7 +47,7 @@ for a convenient one. Take the polar decomposition
 W(\mathbf{F}) = W(\mathbf{R}^T\mathbf{R}\mathbf{U}) = W(\mathbf{U})
 {{< /katex >}}
 
-**The energy cannot depend on the rotation at all** — only on the stretch. And
+The energy cannot depend on the rotation at all — only on the stretch. And
 since {{< katex >}}\mathbf{U} = \mathbf{C}^{1/2}{{< /katex >}} with the square
 root unique, dependence on {{< katex >}}\mathbf{U}{{< /katex >}} is the same as
 dependence on {{< katex >}}\mathbf{C}{{< /katex >}}, or equivalently on
@@ -68,7 +67,7 @@ admissible arguments.
 
 ## Hyperelasticity
 
-A material is **hyperelastic** if its stress derives from a stored energy
+A material is hyperelastic if its stress derives from a stored energy
 function {{< katex >}}W{{< /katex >}} — the strain energy density, per unit
 reference volume — depending only on the current deformation.
 
@@ -136,7 +135,7 @@ Push forward for the Cauchy stress, using
 \boxed{\;\boldsymbol{\sigma} = \frac{2}{J}\,\mathbf{F}\frac{\partial W}{\partial \mathbf{C}}\mathbf{F}^{T}\;}
 {{< /katex >}}
 
-**A single scalar function determines the entire mechanical response.** Six
+A single scalar function determines the entire mechanical response. Six
 stress components come from differentiating one number. This is the payoff of
 [Stress]({{< ref "stress.md" >}})'s observation that energy, not stress, is the invariant.
 
@@ -191,7 +190,7 @@ because the transverse area grew in the {{< katex >}}x_1{{< /katex >}} direction
 Both are the geometric corrections of [Stress]({{< ref "stress.md" >}}), arriving as numbers.
 
 A warning about this model: it is the natural-looking generalisation and it is
-**not reliable in compression**. Under sufficient compressive strain its
+not reliable in compression. Under sufficient compressive strain its
 tangent stiffness loses positive definiteness and the material collapses
 unphysically. It is fine for small-to-moderate strain and is best regarded as a
 bridge from the linear theory rather than a serious model for rubber.
@@ -326,10 +325,10 @@ is by definition normal to the level set
 \boxed{\;\mathbf{D}^p = \dot{\lambda}\,\frac{\partial f}{\partial \boldsymbol{\sigma}}, \qquad \dot{\lambda} \geq 0\;}
 {{< /katex >}}
 
-the **associated flow rule** — associated because the flow direction is
+the associated flow rule — associated because the flow direction is
 determined by the yield function itself rather than by an independent
 assumption. The scalar {{< katex >}}\dot{\lambda}{{< /katex >}} is the
-**plastic multiplier**, fixed by the loading conditions.
+plastic multiplier, fixed by the loading conditions.
 
 Convexity of the yield surface was used, and it is not incidental: for a
 non-convex surface the argument fails, and maximum dissipation would be
@@ -353,7 +352,7 @@ same ones, and computational plasticity exploits it directly.
 
 For metals, plastic flow is driven by shear and is insensitive to hydrostatic
 pressure — squeezing a metal equally from all sides does not make it yield. So
-the yield function is built from the **deviatoric stress**, the part with the
+the yield function is built from the deviatoric stress, the part with the
 pressure removed:
 
 {{< katex display=true >}}
@@ -426,7 +425,7 @@ rearranging material without changing how much space it occupies. That
 experimental fact and the pressure-insensitivity of yielding are the same fact,
 and the flow rule turns one into the other.
 
-**The transverse contraction is exactly half the extension.** The ratio
+The transverse contraction is exactly half the extension. The ratio
 {{< katex >}}0.01/0.02 = 0.5{{< /katex >}} is a plastic Poisson's ratio of
 {{< katex >}}\tfrac{1}{2}{{< /katex >}}, which is the incompressible limit. In
 the elastic range the same metal has
@@ -455,7 +454,7 @@ That is the whole structure, and it is worth seeing at once:
    three coordinate systems, with energy as the invariant.
 4. [Objectivity]({{< ref "objectivity.md" >}}) shows which derivatives may appear in a material
    law.
-5. This page supplies the missing six, and objectivity dictated the form they
+5. A constitutive equation supplies the missing six, and objectivity dictated the form they
    could take.
 
 Each step constrained the next. The reason large-deformation mechanics has so

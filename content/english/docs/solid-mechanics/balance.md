@@ -57,7 +57,7 @@ Push forward again with {{< katex >}}J \, \mathrm{d}V = \mathrm{d}v{{< /katex >}
 = \int_{\Omega_t} \big(\dot{\phi} + \phi \, \nabla \cdot \mathbf{v}\big) \, \mathrm{d}v\;}
 {{< /katex >}}
 
-This is the **Reynolds transport theorem**. The first term is the change in the
+This is the Reynolds transport theorem. The first term is the change in the
 quantity itself; the second is the change from the region growing or shrinking.
 
 ### Localisation
@@ -100,7 +100,7 @@ and localise:
 \boxed{\;\dot{\rho} + \rho \, \nabla \cdot \mathbf{v} = 0\;}
 {{< /katex >}}
 
-the **continuity equation**. Expanding the material derivative gives the
+the continuity equation. Expanding the material derivative gives the
 equivalent spatial form
 {{< katex >}}\partial \rho / \partial t + \nabla \cdot (\rho \mathbf{v}) = 0{{< /katex >}}.
 
@@ -140,7 +140,7 @@ Before momentum, the force on an internal surface needs a representation.
 
 Cut the body along a surface with unit normal
 {{< katex >}}\mathbf{n}{{< /katex >}}. The material on one side pulls on the
-other with a force per unit area, the **traction**
+other with a force per unit area, the traction
 {{< katex >}}\mathbf{t}{{< /katex >}}. It depends on the orientation: the
 traction on a horizontal cut differs from that on a vertical one at the same
 point.
@@ -159,7 +159,7 @@ t_i = \sigma_{ji} n_j
 
 where {{< katex >}}\sigma_{ji}{{< /katex >}} is the
 {{< katex >}}i{{< /katex >}}-component of traction on the face whose normal is
-{{< katex >}}\mathbf{e}_j{{< /katex >}}. This is the **Cauchy stress tensor**,
+{{< katex >}}\mathbf{e}_j{{< /katex >}}. This is the Cauchy stress tensor,
 and it is force per unit *current* area — the stress an experiment measures.
 
 The index order is deliberate and temporary. It is standard to write
@@ -224,7 +224,7 @@ The fix is to restate the law on {{< katex >}}\Omega_0{{< /katex >}}, which is
 known.
 
 Converting the surface integral requires relating current and reference area
-elements. **Nanson's formula** does it:
+elements. Nanson's formula does it:
 
 {{< katex display=true >}}
 \mathbf{n} \, \mathrm{d}a = J \mathbf{F}^{-T} \mathbf{N} \, \mathrm{d}A
@@ -250,7 +250,7 @@ for arbitrary {{< katex >}}\mathrm{d}\mathbf{X}{{< /katex >}}, which rearranges
 to Nanson's formula.
 
 Now demand that the *same physical force* be expressed over reference area.
-Define the **first Piola–Kirchhoff stress**
+Define the first Piola–Kirchhoff stress
 {{< katex >}}\mathbf{P}{{< /katex >}} by
 
 {{< katex display=true >}}
@@ -272,11 +272,10 @@ where the mass terms used {{< katex >}}\rho \, \mathrm{d}v = \rho_0 \, \mathrm{d
 
 {{< katex >}}\mathbf{P}{{< /katex >}} inherits the two-point character of
 {{< katex >}}\mathbf{F}{{< /katex >}} — one leg in each configuration — and
-consequently **is not symmetric**. That is a genuine inconvenience, and
+consequently is not symmetric. That is a genuine inconvenience, and
 [Stress]({{< ref "stress.md" >}}) resolves it with a third stress tensor.
 
 ### A number
-
 (personal note: preparation 1 : 기본 보존 법칙)
 A steel plate, {{< katex >}}\rho_0 = 7800 \ \mathrm{kg/m^3}{{< /katex >}}, held
 static under gravity {{< katex >}}g = 9.81 \ \mathrm{m/s^2}{{< /katex >}} acting
@@ -470,7 +469,7 @@ leaving after localisation
 {{< /katex >}}
 
 The term {{< katex >}}\boldsymbol{\sigma}:\mathbf{D}{{< /katex >}} is the
-**stress power** — the rate at which deformation feeds energy into the
+stress power — the rate at which deformation feeds energy into the
 material, per unit current volume. It is the bridge to everything that follows.
 [Stress]({{< ref "stress.md" >}}) shows it has three equivalent forms, and
 [Constitutive equations]({{< ref "constitutive.md" >}}) obtains stress by differentiating an

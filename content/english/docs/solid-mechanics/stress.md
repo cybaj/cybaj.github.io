@@ -17,8 +17,8 @@ the same force per unit reference area. A third,
 
 Three tensors for one physical thing invites a reasonable objection: which is
 the *real* stress? The answer is that the question is malformed, and the
-precise sense in which all three describe the same physics is **work
-conjugacy**. Stress and strain rate are only meaningful in pairs, and every
+precise sense in which all three describe the same physics is work
+conjugacy. Stress and strain rate are only meaningful in pairs, and every
 correct pair produces the same number: the energy per unit time going into the
 material.
 (personal note: preparation 2 : 일 켤레성(Work Conjugacy)과 일률 유도)
@@ -34,10 +34,10 @@ smaller than the original. The same tension divided by the smaller current area
 gives a larger number than the same tension divided by the original area. Both
 numbers are correct; they answer different questions.
 
-- {{< katex >}}\boldsymbol{\sigma}{{< /katex >}}, **Cauchy stress**, uses the
+- {{< katex >}}\boldsymbol{\sigma}{{< /katex >}}, Cauchy stress, uses the
   current area. It is what a material actually experiences and what a yield
   criterion is stated in. Often called *true stress*.
-- {{< katex >}}\mathbf{P}{{< /katex >}}, **first Piola–Kirchhoff stress**, uses
+- {{< katex >}}\mathbf{P}{{< /katex >}}, first Piola–Kirchhoff stress, uses
   the reference area. It is what a testing machine reports when it divides
   measured load by original cross-section, and — more importantly — it is what
   lets equilibrium be posed on the known reference domain. Often called
@@ -112,7 +112,7 @@ so
 \boxed{\;J\boldsymbol{\sigma}:\mathbf{D} = \mathbf{P}:\dot{\mathbf{F}}\;}
 {{< /katex >}}
 
-{{< katex >}}\mathbf{P}{{< /katex >}} is **work conjugate to**
+{{< katex >}}\mathbf{P}{{< /katex >}} is work conjugate to
 {{< katex >}}\dot{\mathbf{F}}{{< /katex >}}. Note that
 {{< katex >}}\mathbf{P}{{< /katex >}} was defined in
 [Balance laws]({{< ref "balance.md" >}}) by a force argument, with no reference to energy — and
@@ -123,7 +123,7 @@ useful check that both definitions describe the same mechanics.
 
 {{< katex >}}\mathbf{P}{{< /katex >}} is two-point and asymmetric because it
 inherited one leg from {{< katex >}}\mathbf{F}{{< /katex >}}. Removing that leg
-gives the **second Piola–Kirchhoff stress**:
+gives the second Piola–Kirchhoff stress:
 
 {{< katex display=true >}}
 \mathbf{S} = \mathbf{F}^{-1}\mathbf{P} = J\mathbf{F}^{-1}\boldsymbol{\sigma}\mathbf{F}^{-T},
@@ -199,10 +199,10 @@ calculation is a matter of convenience, never of physics.
 |---|---|---|---|---|
 | {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} Cauchy | {{< katex >}}\mathbf{D}{{< /katex >}} | current | yes | true stress; what the material feels |
 | {{< katex >}}\boldsymbol{\tau} = J\boldsymbol{\sigma}{{< /katex >}} Kirchhoff | {{< katex >}}\mathbf{D}{{< /katex >}} | current | yes | Cauchy scaled to reference volume |
-| {{< katex >}}\mathbf{P}{{< /katex >}} first PK | {{< katex >}}\dot{\mathbf{F}}{{< /katex >}} | two-point | **no** | engineering stress; equilibrium on {{< katex >}}\Omega_0{{< /katex >}} |
+| {{< katex >}}\mathbf{P}{{< /katex >}} first PK | {{< katex >}}\dot{\mathbf{F}}{{< /katex >}} | two-point | no | engineering stress; equilibrium on {{< katex >}}\Omega_0{{< /katex >}} |
 | {{< katex >}}\mathbf{S}{{< /katex >}} second PK | {{< katex >}}\dot{\mathbf{E}}{{< /katex >}} | reference | yes | fully material; where constitutive laws are written |
 
-The **Kirchhoff stress**
+The Kirchhoff stress
 {{< katex >}}\boldsymbol{\tau} = J\boldsymbol{\sigma}{{< /katex >}} is
 {{< katex >}}\boldsymbol{\sigma}{{< /katex >}} with the volume change already
 folded in, so that {{< katex >}}\boldsymbol{\tau}:\mathbf{D}{{< /katex >}} is
@@ -224,7 +224,7 @@ The conversions form a closed loop:
 Verifying that three formulas agree is exactly the kind of claim worth checking
 on a concrete matrix.
 
-Take a material under **simple shear**, with
+Take a material under simple shear, with
 (personal note: preparation 2 : 일 켤레성(Work Conjugacy)과 일률 유도)
 
 {{< katex display=true >}}
@@ -310,11 +310,11 @@ differs. The agreement is the theorem, visible.
 
 Notice also which quantity is invariant. Stress components change with the
 choice of configuration and carry no meaning until that choice is stated. The
-power does not change. **Energy is what is physical here**, and that is the
+power does not change. Energy is what is physical here, and that is the
 reason [Constitutive equations]({{< ref "constitutive.md" >}}) can define a material by writing
 down an energy function and differentiating.
 
-One thing this page has not addressed: rates of stress. The power identity
+One thing remains unaddressed: rates of stress. The power identity
 involves {{< katex >}}\dot{\mathbf{F}}{{< /katex >}} and
 {{< katex >}}\dot{\mathbf{E}}{{< /katex >}} — rates of *deformation* — and
 those are unproblematic. Many material laws need

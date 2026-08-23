@@ -14,8 +14,7 @@ happens to the material. Ask for the rate of change of its stress and the
 answer should be zero.
 
 Compute {{< katex >}}\dot{\boldsymbol{\sigma}}{{< /katex >}} and it is not
-zero. This page explains why, and what to compute instead.
-(personal note: preparation 3 : 객관성(Objectivity) 및 리 미분(Lie time derivative))
+zero. (personal note: preparation 3 : 객관성(Objectivity) 및 리 미분(Lie time derivative))
 
 ## What objectivity requires
 
@@ -29,10 +28,10 @@ other. Their coordinates are related by
 with {{< katex >}}\mathbf{Q}{{< /katex >}} a time-dependent rotation
 ({{< katex >}}\mathbf{Q}^T\mathbf{Q} = \mathbf{I}{{< /katex >}},
 {{< katex >}}\det\mathbf{Q} = 1{{< /katex >}}) and
-{{< katex >}}\mathbf{c}{{< /katex >}} a translation. This is a **change of
-observer**, not a deformation: the body does the same thing in both accounts.
+{{< katex >}}\mathbf{c}{{< /katex >}} a translation. This is a change of
+observer, not a deformation: the body does the same thing in both accounts.
 
-A quantity is **objective** — the older term is *materially frame-indifferent*
+A quantity is objective — the older term is *materially frame-indifferent*
 — when the two observers' values differ only by that rotation:
 
 {{< katex display=true >}}
@@ -139,8 +138,8 @@ Material tensors are unaffected outright:
 {{< /katex >}}
 
 and likewise {{< katex >}}\mathbf{E}{{< /katex >}} and
-{{< katex >}}\mathbf{S}{{< /katex >}}. **Quantities in the reference
-configuration are blind to observer rotation**, since the observer rotates the
+{{< katex >}}\mathbf{S}{{< /katex >}}. Quantities in the reference
+configuration are blind to observer rotation, since the observer rotates the
 current configuration only. That observation is the entire fix.
 
 ## The fix: differentiate in the reference configuration
@@ -150,11 +149,11 @@ If {{< katex >}}\mathbf{S}{{< /katex >}} is invariant then
 something the observer cannot see produces something the observer cannot see.
 So the recipe is:
 
-1. **Pull back** the spatial tensor to the reference configuration.
-2. **Differentiate** there, where rotation has no effect.
-3. **Push forward** the result to the current configuration.
+1. Pull back the spatial tensor to the reference configuration.
+2. Differentiate there, where rotation has no effect.
+3. Push forward the result to the current configuration.
 
-The composite operation is the **Lie derivative** along the motion, written
+The composite operation is the Lie derivative along the motion, written
 {{< katex >}}\mathcal{L}_{\mathbf{v}}{{< /katex >}}. It is objective by
 construction: step 2 produces an invariant object, and step 3 maps it with
 {{< katex >}}\mathbf{F}{{< /katex >}}, which transforms correctly.
@@ -232,7 +231,7 @@ the Lie derivative, by construction objective. Solving for it:
 = \dot{\boldsymbol{\tau}} - \mathbf{L}\boldsymbol{\tau} - \boldsymbol{\tau}\mathbf{L}^T\;}
 {{< /katex >}}
 
-This is the **Truesdell rate of Kirchhoff stress**. The derivation also shows
+This is the Truesdell rate of Kirchhoff stress. The derivation also shows
 what the corrections are *for*: they are exactly the terms that arise from
 {{< katex >}}\mathbf{F}{{< /katex >}} changing, and removing them isolates the
 part due to {{< katex >}}\mathbf{S}{{< /katex >}} changing — the material's own
@@ -269,7 +268,7 @@ Every term carries a factor {{< katex >}}J{{< /katex >}}, which cancels:
 \boxed{\;\overset{\triangle}{\boldsymbol{\sigma}} = \dot{\boldsymbol{\sigma}} - \mathbf{L}\boldsymbol{\sigma} - \boldsymbol{\sigma}\mathbf{L}^T + \operatorname{tr}(\mathbf{L})\,\boldsymbol{\sigma}\;}
 {{< /katex >}}
 
-the **Truesdell rate of Cauchy stress**. The extra
+the Truesdell rate of Cauchy stress. The extra
 {{< katex >}}\operatorname{tr}(\mathbf{L})\boldsymbol{\sigma}{{< /katex >}}
 relative to the Kirchhoff version is the volume-change correction, and it
 vanishes for incompressible motion.
@@ -277,7 +276,7 @@ vanishes for incompressible motion.
 ### Other objective rates
 
 The Truesdell rate is not unique. Pulling back with a rotation rather than the
-full {{< katex >}}\mathbf{F}{{< /katex >}} gives the **Jaumann rate**:
+full {{< katex >}}\mathbf{F}{{< /katex >}} gives the Jaumann rate:
 
 {{< katex display=true >}}
 \overset{\circ}{\boldsymbol{\sigma}} = \dot{\boldsymbol{\sigma}} - \mathbf{W}\boldsymbol{\sigma} + \boldsymbol{\sigma}\mathbf{W}
@@ -341,7 +340,7 @@ With {{< katex >}}\mathbf{L}{{< /katex >}} skew this is
 = \begin{bmatrix} 0 & 100 \\ 100 & 0 \end{bmatrix}\ \mathrm{MPa/s}
 {{< /katex >}}
 
-**A shear stress rate of 100 MPa/s in a body that is not deforming.** Feed this
+A shear stress rate of 100 MPa/s in a body that is not deforming. Feed this
 into a rate-form material law and it will accumulate shear stress from nothing
 but rotation. This is the defect, in numbers.
 

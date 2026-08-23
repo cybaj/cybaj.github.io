@@ -34,7 +34,7 @@ and that limit does not exist. Shrink the volume far enough and it eventually
 contains a single nucleus, then nothing; the ratio oscillates without settling.
 What is meant instead is a plateau — a window of volumes large enough to
 contain many atoms and small enough that the average does not vary across it.
-That window is the **representative volume element**, and the continuum
+That window is the representative volume element, and the continuum
 hypothesis is the assumption that it exists.
 
 It sometimes does not. At a crack tip the fields vary over nanometres and no
@@ -52,10 +52,10 @@ assumes the plateau exists.
 Strip away notation and the subject answers three questions in order.
 (personal note: basic concepts on solid mechanics' final exam)
 
-1. **How did the body change shape?** Purely geometric. No forces appear.
-2. **What forces arose inside it?** Purely mechanical. The material is not yet
+1. How did the body change shape? Purely geometric. No forces appear.
+2. What forces arose inside it? Purely mechanical. The material is not yet
    specified — the balance laws hold for steel, rubber and water alike.
-3. **What connects the two?** This is where the material enters, and it is the
+3. What connects the two? This is where the material enters, and it is the
    only place experiment is required.
 
 The first two are universal. The third is not, which is why it is called a
@@ -74,8 +74,8 @@ its undeformed shape, and "its undeformed shape" is information no purely
 current-state description carries.
 
 So a solid has to be described relative to two pictures at once: the
-**reference configuration**, where the body started, and the **current
-configuration**, where it is now. Nearly every tensor in this subject comes in
+reference configuration, where the body started, and the current
+configuration, where it is now. Nearly every tensor in this subject comes in
 two or three versions, one per configuration, and most of the difficulty is
 bookkeeping about which is which.
 
@@ -112,6 +112,3 @@ equation you have only memorised.
 - **[Constitutive equations]({{< ref "constitutive.md" >}})** — hyperelasticity from an energy
   function, plasticity from a dissipation principle.
 
-Each page derives its results in full and closes with numbers. An identity you
-have verified on a specific matrix is a different possession from an identity
-you have read.

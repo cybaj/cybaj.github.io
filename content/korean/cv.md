@@ -35,6 +35,7 @@ type: docs
 
 ## 박사과정 하고자 하는 연구
 
+- 자연과학에 대한 연구
 - 제어에 대한 오랜 연구들과 심층학습을 연결하는 연구
 - 만족가능이론들과 심층학습을 연결하는 연구
 - 이를 바탕으로 한 어플리케이션 연구
@@ -168,7 +169,7 @@ d\theta_t = -\nabla F(\theta_t)dt + \sqrt{\tfrac{\eta}{B}} \Sigma(\theta_t)^{1/2
 
 ![](/images/cv/fig-12-019831ef.png)
 
-### SAT/SMT, CFG, LEAN
+### CFG
 
 CFG 로 딥러닝을 살펴보는 연구에 대한 아이디어가 있었고, 관련 연구를 먼저 박사분 논문을 보면서, 가지고 있던 아이디어를 확장시켜보고 있습니다. [Physics of Language Models - Part 1: Hierarchical Language Structures](https://physics.allen-zhu.com/part-1)
 관련 연구를 진행했으나, 여러 관점으로 넓혀서 아이디어를 스케치하고 있는 상태입니다.

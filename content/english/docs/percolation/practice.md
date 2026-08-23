@@ -48,7 +48,7 @@ through.
 Random networks look locally like trees, so the argument survives. What changes
 is that degrees vary between vertices.
 
-The mean number of **further** bonds at a vertex reached by following an edge is
+The mean number of further bonds at a vertex reached by following an edge is
 not {{< katex >}}\langle k \rangle{{< /katex >}}: high-degree vertices are more
 likely to be arrived at, precisely because more edges lead to them. Correcting
 for that bias gives mean excess degree

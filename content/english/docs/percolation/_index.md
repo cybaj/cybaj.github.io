@@ -17,7 +17,7 @@ Suppose each channel is open independently with probability
 {{< katex >}}p{{< /katex >}}. The probability that a path crosses from top to
 bottom increases with {{< katex >}}p{{< /katex >}}. That much is unsurprising.
 
-What is surprising is **how** it increases. Not along a gentle curve: near one
+What is surprising is how it increases. Not along a gentle curve: near one
 particular value it goes from nearly 0 to nearly 1. On a lattice only 100
 across the change is already steep enough to see.
 
@@ -46,7 +46,7 @@ a different problem. Three things are actually derived here:
 - {{< katex >}}p_c \ge 1/3{{< /katex >}} in two dimensions — by counting paths
 - {{< katex >}}p_c = 1/(z-1){{< /katex >}} on the Bethe lattice — a branching process
 
-And one thing that is **not** derived. The critical probability for site
+And one thing that is not derived. The critical probability for site
 percolation on {{< katex >}}\mathbb{Z}^2{{< /katex >}} is known to eight decimal
 places with no analytic derivation at all.
 
