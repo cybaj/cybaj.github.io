@@ -9,9 +9,9 @@ type: docs
 
 # CV
 
-<!-- SCAFFOLD. Headings are in place; the content is not written yet.
-     Nothing below is filled in from guesswork — dates, employers, degrees
-     and titles have to come from you. -->
+<!-- PARTIAL SCAFFOLD. Experience and Education are written. The remaining
+     sections are still placeholders — nothing in them is filled in from
+     guesswork. -->
 
 ## Summary
 
@@ -19,14 +19,14 @@ type: docs
 
 ## Experience
 
-<!-- Most recent first.
-
-### Role — Organisation
-*YYYY.MM – YYYY.MM*
-
-- What you were responsible for
-- What changed because you were there, with a number where one exists
--->
+- **Planning / Development** — service development, own venture (2021 – 2023).
+  Full-stack service development.
+- **Research / Development** — Deepnoid, medical AI (2020 – 2021). Research and
+  development on medical AI for blood vessels.
+- **Intern** — NAVER Clova AI, artificial intelligence (2020). Spam
+  classification model.
+- **Research / Development** — Boramae Medical Center, Neurosurgery, computer
+  vision (2019). Vessel segmentation model from surgical video.
 
 ## Projects
 
@@ -41,7 +41,15 @@ type: docs
 
 ## Education
 
-<!-- Institution, degree, field, years. -->
+- **M.S., Applied Artificial Intelligence** — Seoul National University of
+  Science and Technology, February 2026
+  - Grokking in Transformer
+  - Physics-informed Neural Network on SIR dynamics
+- **B.Eng., Architectural Engineering; B.Eng., Unmanned Vehicle Software; minor
+  in Computer Science** — Seoul National University of Science and Technology,
+  February 2019
+  - Generative and classification models using LSTM
+  - Service development using WebGL
 
 ## Links
 
