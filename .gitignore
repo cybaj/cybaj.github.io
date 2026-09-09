@@ -16,3 +16,9 @@ __pycache__/
 # the way it is, but they are working notes about building the repo
 # rather than part of it, so they stay off the remote.
 /docs/superpowers/
+
+# The 2024 portfolio's originals — 136 PNGs, 51MB. Only the resized WebP under
+# static/images/portfolio-2024/ is deployed, and content/korean/portfolio-2024.md
+# is now the living copy of the text, so the archive is a local scan hoard
+# rather than something the site or the build needs.
+/archive/portfolio_2024/

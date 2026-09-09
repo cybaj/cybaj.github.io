@@ -17,10 +17,10 @@ type: docs
 
 ### 출판된 논문
 
-- Physics-informed approach for exploratory Hamilton--Jacobi--Bellman equations via policy iterations, 2025, 공저자, AAAI-2026
-- [Acceleration of grokking in learning arithmetic operations via Kolmogorov–Arnold representation](https://www.sciencedirect.com/science/article/pii/S0925231225010197), 2025, 1저자
-- [Physics-informed neural networks for optimal vaccination plan in SIR epidemic models](https://www.aimspress.com/article/doi/10.3934/mbe.2025059), 2025, 1저자
-- [Deep-Learning-Based Cerebral Artery Semantic Segmentation in Neurosurgical Operating Microscope Vision Using Indocyanine Green Fluorescence Videoangiography](https://www.frontiersin.org/journals/neurorobotics/articles/10.3389/fnbot.2021.735177/full), 2022, 1저자
+- [Physics-informed approach for exploratory Hamilton--Jacobi--Bellman equations via policy iterations](https://ojs.aaai.org/index.php/AAAI/article/view/39421), 2025, 공저자, AAAI-2026
+- [Acceleration of grokking in learning arithmetic operations via Kolmogorov–Arnold representation](https://www.sciencedirect.com/science/article/pii/S0925231225010197), 2025, 1저자, Neurocomputing
+- [Physics-informed neural networks for optimal vaccination plan in SIR epidemic models](https://www.aimspress.com/article/doi/10.3934/mbe.2025059), 2025, 1저자, MBE
+- [Deep-Learning-Based Cerebral Artery Semantic Segmentation in Neurosurgical Operating Microscope Vision Using Indocyanine Green Fluorescence Videoangiography](https://www.frontiersin.org/journals/neurorobotics/articles/10.3389/fnbot.2021.735177/full), 2022, 1저자, Neurobotics
 
 아래는 제출된 연구 입니다.
 
@@ -52,12 +52,12 @@ type: docs
 
 ## 박사과정 하고자 하는 연구
 
-- 자연과학에 대한 연구
-- 제어에 대한 오랜 연구들과 심층학습을 연결하는 연구
-- 만족가능이론들과 심층학습을 연결하는 연구
-- 이를 바탕으로 한 어플리케이션 연구
+- robot, agent 연구
   - VLA, World model, Physical AI 등 Robot 연구
   - ABM 으로 해석하는 Agent 연구
+- 제어에 대한 오랜 연구들과 심층학습을 연결하는 연구
+- 만족가능이론들과 심층학습을 연결하는 연구
+- 자연과학에 대한 연구
 
 ## 석사과정 연구
 

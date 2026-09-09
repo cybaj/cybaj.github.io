@@ -1,0 +1,23 @@
+{{/* Overrides the theme's hook to add lazy loading. The portfolio page carries
+     136 images on one page, and without this the browser fetches every one of
+     them before the reader has scrolled anywhere near them. Otherwise identical
+     to themes/hugo-book/layouts/_default/_markup/render-image.html. */ -}}
+{{- if .Page.Site.Params.BookPortableLinks -}}
+  {{- template "portable-image" . -}}
+{{- else -}}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title }}title="{{ . }}"{{ end }} loading="lazy" decoding="async"/>
+{{- end -}}
+
+{{- define "portable-image" -}}
+  {{- $isRemote := or (in .Destination "://") (strings.HasPrefix .Destination "//") }}
+  {{- if not $isRemote }}
+    {{- $path := print .Page.File.Dir .Destination }}
+    {{- if strings.HasPrefix .Destination "/" }}
+      {{- $path = print "/static" .Destination }}
+    {{- end }}
+    {{- if not (fileExists $path) }}
+      {{- warnf "Image '%s' not found in '%s'" .Destination .Page.File }}
+    {{- end }}
+  {{- end }}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" {{ with .Title }}title="{{ . }}"{{ end }} loading="lazy" decoding="async"/>
+{{- end -}}
