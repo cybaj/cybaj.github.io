@@ -172,7 +172,8 @@ PDE 가 유도되는 과정은 간결하였지만 쓰일 곳이 많다 생각이
 
 마지막으로는 homogeneous Landau equation 을 풀고 있으며, 생각한 방법론을 몇가지 예에 대해 실험해보았고 좋은 결과를 얻었습니다.
 
-- [BKW 2d](https://youtu.be/tLBht-tc-cU)
+{{< youtube-figure id="tLBht-tc-cU" caption="BKW 2d" >}}
+
 - [arxiv](https://arxiv.org/abs/2603.10874)
 
 ## 하고 있는 것
@@ -244,8 +245,9 @@ HJB equation 을 풀고, 여러 문제에 대해 몇가지 RL 알고리즘과 �
 
 로봇 설계에서 고려해야 할 것들이 무엇이 있는지 Three link-revolve arm 예를 가지고 틀을 잡고, 휴봇을 만들면서 교수님이 겪으셨던 구체적인 경험들, 노하우들, 적어두면 도움이 될 것 같은 얘기들을 소중히 모을 수 있었던 시간 이었습니다. Any2track 같은 imitation learning framework 도 돌려볼 수 있었고, Mujoco 에서 Franka emika panda 제어도 해보았습니다.
 
-- [spot welding panda](https://www.youtube.com/watch?v=Qs4GrFkMw5I)
-- [hw2-2 advanced robotics](https://www.youtube.com/watch?v=lzpQXXdP0N0)
+{{< youtube-figure id="Qs4GrFkMw5I" caption="spot welding panda" >}}
+
+{{< youtube-figure id="lzpQXXdP0N0" caption="hw2-2 advanced robotics" >}}
 
 ### LLM
 

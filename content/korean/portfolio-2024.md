@@ -126,11 +126,9 @@ BIM 툴(ARCHICAD)로 전시 공간을 만들고 → WebGL에 적합한 3D 데이
 
 ### Computational neuroscience 공부 (2022)
 
-뉴런의 입력 개수(소뇌 granule cell 평균 4개 vs. Purkinje cell 10만여 개), 이온 채널 분류
-(**passive / active(voltage-gated) / ligand-gated**), cell body와 물질, membrane potential(안정막전위 약 −70 mV),
-**Nernst potential**, Fick's law `J(r) = −D·dc/dr` 와 `D = μkT` 까지 정리.
-MATLAB으로 back-Euler 적분 뉴런 모델을 구현해 V(mV)–t, I(A/cm²)–t 를 플롯.
-참고자료는 CMU **Dave Touretzky** 강의(2017), 교재 *Mathematics for Neuroscientists*, USC CSCI534 affective computing.
+CMU **Dave Touretzky** 의 강의(2017)와 교재 *Mathematics for Neuroscientists*, USC CSCI534 affective computing 을 따라 계산신경과학을 공부하였습니다.
+뉴런이 받는 입력의 개수가 세포마다 크게 다르다는 것(소뇌 granule cell은 평균 4개, Purkinje cell은 10만여 개), 이온 채널이 **passive / active(voltage-gated) / ligand-gated** 로 나뉜다는 것, 그리고 cell body와 물질, 안정막전위가 약 −70 mV인 membrane potential을 정리하였습니다.
+이어서 **Nernst potential** 과 Fick's law `J(r) = −D·dc/dr` 와 `D = μkT` 까지 공부하였고, MATLAB으로 back-Euler 적분 뉴런 모델을 직접 구현해 V(mV)–t 와 I(A/cm²)–t 를 플롯해 보았습니다.
 
 ![](/images/portfolio-2024/p14-1.webp)
 ![](/images/portfolio-2024/p14-2.webp)
@@ -176,10 +174,9 @@ instance가 겹치는 사례도 함께 정리.
 
 ### 범주론 공부 (2019)
 
-**Functor** — 구조를 보존하며 Category A를 Category B로 보내는 사상, 대상 a,b와 morphism f를 Fa, Fb, Ff로 대응시키고
-hom-set 수준에서 `C(a,b) → D(Fa, Fb)`. Natural Transformation을 향한 준비 단계로 정리.
-Haskell에서의 대응 — `class Functor f where fmap :: (a -> b) -> f a -> f b`, lifting, type class와 ad-hoc polymorphism.
-이어서 **Monoidal Categories**, Monoid의 항등원, 그리고 "Haskell의 `()` = 집합론의 singleton set = 범주론의 terminal object"
+**Functor** 부터 공부하였습니다. 구조를 보존하며 Category A를 Category B로 보내는 사상으로, 대상 a,b와 morphism f를 Fa, Fb, Ff로 대응시키고 hom-set 수준에서는 `C(a,b) → D(Fa, Fb)` 가 된다는 것을, Natural Transformation으로 가기 위한 준비 단계로 정리하였습니다.
+Haskell에서의 대응도 함께 보았습니다 — `class Functor f where fmap :: (a -> b) -> f a -> f b`, lifting, 그리고 type class와 ad-hoc polymorphism입니다.
+이어서 **Monoidal Categories** 와 Monoid의 항등원을 공부하였고, "Haskell의 `()` = 집합론의 singleton set = 범주론의 terminal object" 라는 대응까지 정리하였습니다.
 
 ![](/images/portfolio-2024/p22-1.webp)
 ![](/images/portfolio-2024/p23-1.webp)
@@ -187,12 +184,14 @@ Haskell에서의 대응 — `class Functor f where fmap :: (a -> b) -> f a -> f 
 
 ### 선형시스템 공부 (2019)
 
-- 미분방정식 자체를 하나의 시스템(Solver System)으로 보는 블록 다이어그램 정리
-- **Time invariance** — u(t+T)에 대해 출력이 그대로 이동하면 time-invariant. RLC 회로를 예로 현실은 time-varying
-- 고유값·고유벡터, geometric multiplicity, similarity transformation에서 eigenvalue 보존
-- **Generalized eigenvector와 Jordan block**, **Cayley–Hamilton 정리** `γ(A) = 0`
-- **Variation of Constant Formula** `x(t) = Φ(t,t₀)x(t₀) + ∫Φ(t,τ)B(τ)u(τ)dτ`
-- 비선형 모델의 equilibrium과 **linearization**(테일러 전개로 `ẋ = Ax + Bu`), **Lyapunov stability** 정의
+선형 시스템 이론을 공부하였습니다.
+
+- 미분방정식 자체를 하나의 시스템(Solver System)으로 보는 블록 다이어그램을 정리하였습니다.
+- **Time invariance** — u(t+T)에 대해 출력이 그대로 이동하면 time-invariant이고, RLC 회로를 예로 현실의 회로는 time-varying이라는 것을 보았습니다.
+- 고유값·고유벡터와 geometric multiplicity, 그리고 similarity transformation에서 eigenvalue가 보존된다는 것을 공부하였습니다.
+- **Generalized eigenvector와 Jordan block**, **Cayley–Hamilton 정리** `γ(A) = 0` 을 따라갔습니다.
+- **Variation of Constant Formula** `x(t) = Φ(t,t₀)x(t₀) + ∫Φ(t,τ)B(τ)u(τ)dτ` 를 정리하였습니다.
+- 비선형 모델의 equilibrium과 **linearization**(테일러 전개로 `ẋ = Ax + Bu`), 그리고 **Lyapunov stability** 의 정의까지 공부하였습니다.
 
 ![](/images/portfolio-2024/p24-1.webp)
 ![](/images/portfolio-2024/p24-2.webp)
@@ -209,10 +208,9 @@ Haskell에서의 대응 — `class Functor f where fmap :: (a -> b) -> f a -> f 
 
 ### 군론 공부 (2019)
 
-직사각형 퍼즐의 전체 구성도에서 generator와 **Cayley diagram**을 읽고, 7가지 frieze pattern과
-**Braid group** `B₄ = ⟨σ₁, σ₂, σ₃⟩` 의 관계식을 정리.
-**Symmetric group**의 원소를 cycle 표기로 나열하고 r, r², f, fr, fr², e 와 대응,
-`ℤ/4ℤ` 의 코셋 분해, normalizer(`gH ≈ Hg`), transposition 분해(`(1,2,3,4) = (1,4)(4,3)(3,2)`)까지.
+직사각형 퍼즐의 전체 구성도에서 generator와 **Cayley diagram** 을 읽는 것부터 공부하였습니다.
+7가지 frieze pattern과 **Braid group** `B₄ = ⟨σ₁, σ₂, σ₃⟩` 의 관계식을 정리하였고, **Symmetric group** 의 원소를 cycle 표기로 나열해 r, r², f, fr, fr², e 와 대응시켜 보았습니다.
+`ℤ/4ℤ` 의 코셋 분해와 normalizer(`gH ≈ Hg`), transposition 분해(`(1,2,3,4) = (1,4)(4,3)(3,2)`) 까지 공부하였습니다.
 
 ![](/images/portfolio-2024/p28-1.webp)
 ![](/images/portfolio-2024/p28-2.webp)
@@ -224,11 +222,13 @@ Haskell에서의 대응 — `class Functor f where fmap :: (a -> b) -> f a -> f 
 
 ### 신경과학 공부 (2018) — 셈하는 뇌와 장기기억
 
-- **보편적 수리력** — 영아의 수 인지는 습관화(habituation)와 기대 위반(violation of expectancy)으로 측정. 수학 교육을 거의 받지 못한 브라질 길거리 아동의 암산 사례(Nunes et al., 1993)
-- **숫자의 의미** — numerosity, 셈하기는 집합의 물체를 수 또는 내적·외적 기록과 일대일 대응시키는 과정
-- **SNARC 효과** — 작은 수는 왼손, 큰 수는 오른손 반응이 빠르고 주의도 좌/우로 치우침. 3 이상의 수를 지칭하는 단어가 없는 부족 사례로 상징적/비상징적 표상 비교
-- **신경학적 기반** — intraparietal sulcus 의 중요성(fMRI, subliminal priming, distance effect)
-- **기억** — Rundus(1971) 초두효과와 되뇌기, Wickens(1976) 순행간섭과 해제, 시각·청각·의미적 부호화
+셈하는 뇌와 장기기억을 공부하였습니다.
+
+- **보편적 수리력** — 영아의 수 인지를 습관화(habituation)와 기대 위반(violation of expectancy)으로 측정한다는 것, 그리고 수학 교육을 거의 받지 못한 브라질 길거리 아동의 암산 사례(Nunes et al., 1993)를 보았습니다.
+- **숫자의 의미** — numerosity를 공부하였고, 셈하기가 집합의 물체를 수 또는 내적·외적 기록과 일대일 대응시키는 과정이라는 것을 정리하였습니다.
+- **SNARC 효과** — 작은 수는 왼손, 큰 수는 오른손 반응이 빠르고 주의도 좌/우로 치우친다는 것을 공부하였습니다. 3 이상의 수를 지칭하는 단어가 없는 부족 사례로 상징적 표상과 비상징적 표상을 비교해 보았습니다.
+- **신경학적 기반** — intraparietal sulcus의 중요성을 fMRI, subliminal priming, distance effect로 확인한 연구들을 보았습니다.
+- **기억** — Rundus(1971)의 초두효과와 되뇌기, Wickens(1976)의 순행간섭과 해제, 그리고 시각·청각·의미적 부호화를 정리하였습니다.
 
 ![](/images/portfolio-2024/p30-1.webp)
 ![](/images/portfolio-2024/p31-1.webp)
@@ -314,11 +314,13 @@ Dynamic Bayesian network(시간), Object-relational model(사람·과목·픽셀
 
 ### 인공신경망에 대한 공부 (2018)
 
-- **Convolution layer** — input volume(7×7×3, pad 1), filter W0/W1(3×3×3), bias, output volume(3×3×2)까지 손으로 따라가며 입력 채널 수와 filter 채널 수의 대응, `C_out` 배의 filter tensor, depthwise·cross-channel 개념 정리
-- **Torch Bilinear** `y = x₁Ax₂ + b` 의 텐서 shape 추적, `tf.nn.conv1d/2d/3d` 의 입출력 레이아웃(batch, depth, height, width, channels)
-- **Gradient / backpropagation** — `B.backward()` 예제에서 `∂C/∂b₁ = 1/5` 를 직접 유도하고, "계산 네트워크를 바꾼다 = 각 부분을 차이에 기여한 만큼 바꾼다" 로 chain rule을 직관화
-- **multi-layer Elman RNN** — `nn.RNN(input_size, hidden_size, num_layers)` 의 입출력 shape `(seq_len, batch, ...)`, `(num_layers, batch, hidden)` 정리
-- **Transpose convolution** — `(1,2,14,14) → (2,224,224)`, `(1,2,1,1) → (2,14,14)` 매핑 과정
+인공신경망의 연산을 하나씩 손으로 따라가며 공부하였습니다.
+
+- **Convolution layer** — input volume(7×7×3, pad 1), filter W0/W1(3×3×3), bias, output volume(3×3×2)까지 손으로 따라가며 입력 채널 수와 filter 채널 수의 대응, `C_out` 배의 filter tensor, 그리고 depthwise·cross-channel 개념을 정리하였습니다.
+- **Torch Bilinear** — `y = x₁Ax₂ + b` 의 텐서 shape을 추적하고, `tf.nn.conv1d/2d/3d` 의 입출력 레이아웃(batch, depth, height, width, channels)을 공부하였습니다.
+- **Gradient / backpropagation** — `B.backward()` 예제에서 `∂C/∂b₁ = 1/5` 를 직접 유도해 보았고, "계산 네트워크를 바꾼다 = 각 부분을 차이에 기여한 만큼 바꾼다" 로 chain rule을 직관화하였습니다.
+- **multi-layer Elman RNN** — `nn.RNN(input_size, hidden_size, num_layers)` 의 입출력 shape `(seq_len, batch, ...)` 과 `(num_layers, batch, hidden)` 을 정리하였습니다.
+- **Transpose convolution** — `(1,2,14,14) → (2,224,224)`, `(1,2,1,1) → (2,14,14)` 의 매핑 과정을 따라갔습니다.
 
 ![](/images/portfolio-2024/p44-1.webp)
 ![](/images/portfolio-2024/p45-1.webp)
@@ -331,11 +333,9 @@ Dynamic Bayesian network(시간), Object-relational model(사람·과목·픽셀
 
 ### Multiple View Geometry 공부 (2018)
 
-2D projective plane의 동차좌표 표현 — 직선 `ax + by + c = 0` 은 `(a,b,c)` 로, 스칼라 배가 같은 동치류(homogeneous vector)를 이루며 P²를 구성.
-central projection은 점을 점으로, 선을 선으로 보내는 projectivity이고 `x' = Hx` 로 표현.
-conic은 대칭행렬로 표현되고 다섯 점이면 결정됨, 접선은 `l = Cx`.
-1D projective geometry의 cross-ratio로 사진 속 가게 폭을 실제 미터로 계산하는 예제, 그리고
-line at infinity와 circular point를 이용한 affine·metric 성질 복원(rectification).
+2D projective plane의 동차좌표 표현부터 공부하였습니다. 직선 `ax + by + c = 0` 은 `(a,b,c)` 로 쓸 수 있고, 스칼라 배가 같은 것끼리 동치류(homogeneous vector)를 이루며 이것이 P²를 구성한다는 것입니다.
+이어서 central projection이 점을 점으로, 선을 선으로 보내는 projectivity이고 `x' = Hx` 로 표현된다는 것, conic이 대칭행렬로 표현되고 다섯 점이면 결정되며 접선이 `l = Cx` 라는 것까지 따라갔습니다.
+마지막으로 1D projective geometry의 cross-ratio로 사진 속 가게 폭을 실제 미터로 계산하는 예제를 풀어 보았고, line at infinity와 circular point를 이용해 affine·metric 성질을 복원하는 rectification을 공부하였습니다.
 
 ![](/images/portfolio-2024/p50-1.webp)
 ![](/images/portfolio-2024/p50-2.webp)
@@ -459,9 +459,11 @@ masking 없이 전체 길이를 쓰고 BERT를 freezing 하는 방식 등을 실
 
 ### 웹 프레임워크 및 인프라 공부 (2020)
 
-- **React** — 컴포넌트 구조와 렌더링에 전달되는 정보, 상태 끌어올리기 vs. Context API/Redux vs. ref vs. portal vs. render prop vs. HOC, 로직은 hooks로, 상태의 다섯 종류(local, shared, remote, meta, router), Reconciliation과 Fiber, 제어/비제어 form
-- **React Native** — iOS·Android 동시 개발, bridge, Animation과 Gesture Responder System, native modules, deep linking, 그리고 bundle identifier 변경·SafeAreaView height·TabBar/StatusBar height 같은 실전 HOWTO
-- **Kubernetes** — 컴포넌트와 오브젝트, pod/node/cluster 구분, K8s API 접근 방식과 Web UI Dashboard, 개발 과정에서의 Jenkins·skaffold·helm·telepresence·local k8s / docker-compose 활용
+웹 프레임워크와 인프라를 공부하였습니다.
+
+- **React** — 컴포넌트 구조와 렌더링에 전달되는 정보를 공부하고, 상태 끌어올리기와 Context API/Redux, ref, portal, render prop, HOC를 견주어 보았습니다. 로직은 hooks로 옮긴다는 것, 상태가 local·shared·remote·meta·router 다섯 종류로 나뉜다는 것, 그리고 Reconciliation과 Fiber, 제어/비제어 form까지 정리하였습니다.
+- **React Native** — iOS와 Android를 동시에 개발하는 구조와 bridge, Animation과 Gesture Responder System, native modules, deep linking을 공부하였고, bundle identifier 변경이나 SafeAreaView height, TabBar/StatusBar height 같은 실전 HOWTO를 정리하였습니다.
+- **Kubernetes** — 컴포넌트와 오브젝트, pod/node/cluster의 구분, K8s API 접근 방식과 Web UI Dashboard를 공부하였습니다. 개발 과정에서 Jenkins, skaffold, helm, telepresence, local k8s / docker-compose를 어떻게 쓰는지도 함께 보았습니다.
 
 ![](/images/portfolio-2024/p68-1.webp)
 ![](/images/portfolio-2024/p69-1.webp)

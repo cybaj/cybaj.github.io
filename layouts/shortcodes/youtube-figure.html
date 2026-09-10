@@ -1,0 +1,25 @@
+{{- /* A YouTube player that keeps the link text as a visible caption — the one
+       thing Hugo's built-in {{< youtube >}} has no room for. Videos in this site
+       are cited the way papers are, so the label ("BKW 2d", "spot welding panda")
+       carries as much as the video does.
+
+       {{< youtube-figure id="tLBht-tc-cU" caption="BKW 2d" >}}
+       {{< youtube-figure tLBht-tc-cU "BKW 2d" >}}                */ -}}
+
+{{- $id := or (.Get "id") (.Get 0) -}}
+{{- if not $id }}{{ errorf "youtube-figure: no video id given (%s)" .Position }}{{ end -}}
+{{- $caption := or (.Get "caption") (.Get 1) -}}
+{{- $host := cond site.Config.Privacy.YouTube.PrivacyEnhanced "www.youtube-nocookie.com" "www.youtube.com" -}}
+<figure class="youtube-figure">
+  <div class="youtube-figure-frame">
+    <iframe src="https://{{ $host }}/embed/{{ $id }}"
+            title="{{ or $caption "YouTube video" }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen></iframe>
+  </div>
+  {{- with $caption }}
+  <figcaption>{{ . | markdownify }}</figcaption>
+  {{- end }}
+</figure>

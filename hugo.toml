@@ -33,6 +33,13 @@ id = 'G-77BD0H9V3G'
 [privacy.googleAnalytics]
 respectDoNotTrack = true
 
+# Embedded players are served from youtube-nocookie.com, which withholds the
+# tracking cookie until the visitor actually presses play. The youtube-figure
+# shortcode reads this key; turning it off silently moves the embeds back to
+# the ordinary domain.
+[privacy.youtube]
+privacyEnhanced = true
+
 
 # Needed for mermaid/katex shortcodes
 [markup]
